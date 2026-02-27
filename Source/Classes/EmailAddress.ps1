@@ -293,12 +293,18 @@ class EmailAddress {
 
     <#
     .SYNOPSIS
-        Determines whether a string is a valid email address format.
+        Returns a human-readable reason string if the address is invalid, or
+        $null if the address is valid.
 
     .DESCRIPTION
-        Validates an email address against the practical subset of RFC 5321/5322 rules
-        used by real-world mail systems. Checks structural format, length constraints,
-        and character rules for both the local part and domain.
+        Contains all validation logic for RFC 5321/5322 address format checking.
+        This is the single source of truth for validation; IsValidEmailAddressFormat
+        and its aliases all delegate here.
+
+        Returning an empty string for success (rather than $null) allows callers to
+        use [string]::IsNullOrEmpty(): if ([string]::IsNullOrEmpty(GetValidationFailureReason($addr))) { valid }.
+        Note: PowerShell coerces $null to '' on return from a [string]-typed method,
+        so callers must use IsNullOrEmpty rather than a $null check.
 
         Validation rules applied:
         - Must contain exactly one @ symbol
@@ -310,6 +316,135 @@ class EmailAddress {
         - Domain: must contain at least one dot (i.e. a TLD is required)
         - Domain: TLD must be at least 2 characters
         - Total length must not exceed 320 characters
+
+        Note: quoted local parts (e.g. "john doe"@example.com) and IP address
+        literals (e.g. user@[192.168.1.1]) are intentionally not supported, as
+        they are rarely accepted by real-world mail systems.
+
+    .PARAMETER address
+        The plain email address string to validate (local-part@domain).
+
+    .OUTPUTS
+        [string] A specific failure reason, or $null if the address is valid.
+
+    .EXAMPLE
+        [EmailAddress]::GetValidationFailureReason("john.doe@example.com")
+        # Returns: $null  (address is valid)
+
+    .EXAMPLE
+        [EmailAddress]::GetValidationFailureReason("user@@example.com")
+        # Returns: "Address must contain exactly one '@' symbol."
+    #>
+    static [string] GetValidationFailureReason([string]$address) {
+        # Must not be null or whitespace
+        if ([string]::IsNullOrWhiteSpace($address)) {
+            return 'Address must not be null or empty.'
+        }
+
+        # Total length must not exceed 320 characters (RFC 5321)
+        if ($address.Length -gt 320) {
+            return "Address exceeds the maximum length of 320 characters (actual: $($address.Length))."
+        }
+
+        # Must contain exactly one @ symbol
+        $atIndex = $address.IndexOf('@')
+        if ($atIndex -le 0 -or $atIndex -ne $address.LastIndexOf('@')) {
+            return "Address must contain exactly one '@' symbol."
+        }
+
+        $localPart = $address.Substring(0, $atIndex)
+        $domain = $address.Substring($atIndex + 1)
+
+        #--------------------------------------------------------------
+        # Validate local part
+        #--------------------------------------------------------------
+
+        # Local part length: 1–64 characters (RFC 5321)
+        if ($localPart.Length -lt 1 -or $localPart.Length -gt 64) {
+            return "Local part '$localPart' must be between 1 and 64 characters (actual: $($localPart.Length))."
+        }
+
+        # Local part: allowed characters (RFC 5321/5322 practical subset)
+        # Letters, digits, and: . ! # $ % & ' * + - / = ? ^ _ ` { | } ~
+        if ($localPart -notmatch '^[a-zA-Z0-9.!#$%&''*+\-/=?^_`{|}~]+$') {
+            return "Local part '$localPart' contains invalid characters. Only letters, digits, and the characters . ! # `$ % & ' * + - / = ? ^ _ `` { | } ~ are allowed."
+        }
+
+        # Local part: dot not allowed at start or end
+        if ($localPart.StartsWith('.') -or $localPart.EndsWith('.')) {
+            return "Local part '$localPart' must not start or end with a dot."
+        }
+
+        # Local part: no consecutive dots
+        if ($localPart -match '\.\.') {
+            return "Local part '$localPart' must not contain consecutive dots."
+        }
+
+        #--------------------------------------------------------------
+        # Validate domain
+        #--------------------------------------------------------------
+
+        # Domain must not be empty
+        if ([string]::IsNullOrWhiteSpace($domain)) {
+            return 'Domain must not be empty.'
+        }
+
+        # Domain length: 1–255 characters (RFC 5321)
+        if ($domain.Length -gt 255) {
+            return "Domain '$domain' exceeds the maximum length of 255 characters (actual: $($domain.Length))."
+        }
+
+        # Domain must contain at least one dot (TLD required)
+        if (-not $domain.Contains('.')) {
+            return "Domain '$domain' must contain at least one dot (a top-level domain is required)."
+        }
+
+        # Domain must not start or end with a dot or hyphen
+        if ($domain.StartsWith('.') -or $domain.EndsWith('.')) {
+            return "Domain '$domain' must not start or end with a dot."
+        }
+        if ($domain.StartsWith('-') -or $domain.EndsWith('-')) {
+            return "Domain '$domain' must not start or end with a hyphen."
+        }
+
+        # Validate each domain label
+        $labels = $domain.Split('.')
+        foreach ($label in $labels) {
+            # Each label must be 1–63 characters
+            if ($label.Length -lt 1 -or $label.Length -gt 63) {
+                return "Domain label '$label' must be between 1 and 63 characters (actual: $($label.Length))."
+            }
+
+            # Each label: only letters, digits, and hyphens
+            if ($label -notmatch '^[a-zA-Z0-9-]+$') {
+                return "Domain label '$label' contains invalid characters. Only letters, digits, and hyphens are allowed."
+            }
+
+            # Each label must not start or end with a hyphen
+            if ($label.StartsWith('-') -or $label.EndsWith('-')) {
+                return "Domain label '$label' must not start or end with a hyphen."
+            }
+        }
+
+        # TLD (last label) must be at least 2 characters
+        if ($labels[-1].Length -lt 2) {
+            return "Top-level domain '$($labels[-1])' must be at least 2 characters."
+        }
+
+        return $null
+    }
+
+    <#
+    .SYNOPSIS
+        Determines whether a string is a valid email address format.
+
+    .DESCRIPTION
+        Validates an email address against the practical subset of RFC 5321/5322 rules
+        used by real-world mail systems. Delegates all logic to GetValidationFailureReason;
+        returns $true if that method returns $null (no failure reason), $false otherwise.
+
+        For a human-readable explanation of why an address is invalid, call
+        GetValidationFailureReason directly.
 
         Note: quoted local parts (e.g. "john doe"@example.com) and IP address
         literals (e.g. user@[192.168.1.1]) are intentionally not supported, as
@@ -335,100 +470,7 @@ class EmailAddress {
         # Returns: $true
     #>
     static [bool] IsValidEmailAddressFormat([string]$address) {
-        # Must not be null or whitespace
-        if ([string]::IsNullOrWhiteSpace($address)) {
-            return $false
-        }
-
-        # Total length must not exceed 320 characters (RFC 5321)
-        if ($address.Length -gt 320) {
-            return $false
-        }
-
-        # Must contain exactly one @ symbol
-        $atIndex = $address.IndexOf('@')
-        if ($atIndex -le 0 -or $atIndex -ne $address.LastIndexOf('@')) {
-            return $false
-        }
-
-        $localPart = $address.Substring(0, $atIndex)
-        $domain = $address.Substring($atIndex + 1)
-
-        #--------------------------------------------------------------
-        # Validate local part
-        #--------------------------------------------------------------
-
-        # Local part length: 1–64 characters (RFC 5321)
-        if ($localPart.Length -lt 1 -or $localPart.Length -gt 64) {
-            return $false
-        }
-
-        # Local part: allowed characters (RFC 5321/5322 practical subset)
-        # Letters, digits, and: . ! # $ % & ' * + - / = ? ^ _ ` { | } ~
-        if ($localPart -notmatch '^[a-zA-Z0-9.!#$%&''*+\-/=?^_`{|}~]+$') {
-            return $false
-        }
-
-        # Local part: dot not allowed at start or end
-        if ($localPart.StartsWith('.') -or $localPart.EndsWith('.')) {
-            return $false
-        }
-
-        # Local part: no consecutive dots
-        if ($localPart -match '\.\.') {
-            return $false
-        }
-
-        #--------------------------------------------------------------
-        # Validate domain
-        #--------------------------------------------------------------
-
-        # Domain must not be empty
-        if ([string]::IsNullOrWhiteSpace($domain)) {
-            return $false
-        }
-
-        # Domain length: 1–255 characters (RFC 5321)
-        if ($domain.Length -gt 255) {
-            return $false
-        }
-
-        # Domain must contain at least one dot (TLD required)
-        if (-not $domain.Contains('.')) {
-            return $false
-        }
-
-        # Domain must not start or end with a dot or hyphen
-        if ($domain.StartsWith('.') -or $domain.EndsWith('.') -or
-            $domain.StartsWith('-') -or $domain.EndsWith('-')) {
-            return $false
-        }
-
-        # Validate each domain label
-        $labels = $domain.Split('.')
-        foreach ($label in $labels) {
-            # Each label must be 1–63 characters
-            if ($label.Length -lt 1 -or $label.Length -gt 63) {
-                return $false
-            }
-
-            # Each label: only letters, digits, and hyphens
-            if ($label -notmatch '^[a-zA-Z0-9-]+$') {
-                return $false
-            }
-
-            # Each label must not start or end with a hyphen
-            if ($label.StartsWith('-') -or $label.EndsWith('-')) {
-                return $false
-            }
-        }
-
-        # TLD (last label) must be at least 2 characters
-        if ($labels[-1].Length -lt 2) {
-            return $false
-        }
-
-        return $true
+        return [string]::IsNullOrEmpty([EmailAddress]::GetValidationFailureReason($address))
     }
 
     <#

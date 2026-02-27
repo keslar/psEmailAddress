@@ -82,7 +82,7 @@
         Returns:
           Input   : notanemail
           IsValid : False
-          Reason  : Address does not match a valid email format.
+          Reason  : Address must contain exactly one '@' symbol.
 
     .EXAMPLE
         "crk4@pitt.edu", "bad", "jdoe@example.com" | Test-EmailAddress
@@ -148,7 +148,7 @@ function Test-EmailAddress {
                 return [PSCustomObject]@{
                     Input   = ''
                     IsValid = $false
-                    Reason  = 'Address does not match a valid email format.'
+                    Reason  = 'Address must not be null or empty.'
                 }
             } else {
                 return $false
@@ -175,14 +175,14 @@ function Test-EmailAddress {
                 }
             }
 
-            $isValid = [EmailAddress]::IsValidEmailAddressFormat($addressToTest)
+            $failureReason = [EmailAddress]::GetValidationFailureReason($addressToTest)
+            $isValid = [string]::IsNullOrEmpty($failureReason)
 
             if ($Detailed) {
-                $reason = if ($isValid) { '' } else { 'Address does not match a valid email format.' }
                 [PSCustomObject]@{
                     Input   = $inputDisplay
                     IsValid = $isValid
-                    Reason  = $reason
+                    Reason  = if ($isValid) { '' } else { $failureReason }
                 }
             } else {
                 $isValid
