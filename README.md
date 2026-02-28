@@ -1,247 +1,380 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
-<a name="readme-top"></a>
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
+# EmailAddress
 
+A PowerShell module providing a strongly-typed `EmailAddress` class and eight cmdlets for parsing, validating, normalizing, formatting, and comparing RFC 5321/5322 email addresses — in both PowerShell 5.1 and PowerShell 7+.
 
+[![CI](https://github.com/keslar/psEmailAddress/actions/workflows/ci.yml/badge.svg)](https://github.com/keslar/psEmailAddress/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/keslar/psEmailAddress/blob/main/LICENSE.md)
+[![PowerShell Gallery](https://img.shields.io/powershellgallery/v/EmailAddress)](https://www.powershellgallery.com/packages/EmailAddress)
 
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-[![LinkedIn][linkedin-shield]][linkedin-url]
+---
 
+## Table of Contents
 
+- [Overview](#overview)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [The EmailAddress Class](#the-emailaddress-class)
+- [Cmdlets](#cmdlets)
+  - [New-EmailAddress](#new-emailaddress)
+  - [Test-EmailAddress](#test-emailaddress)
+  - [ConvertTo-EmailAddress](#convertto-emailaddress)
+  - [ConvertTo-NormalizedEmailAddress](#convertto-normalizedemailaddress)
+  - [Format-EmailAddress](#format-emailaddress)
+  - [Get-EmailAddress](#get-emailaddress)
+  - [Set-EmailAddress](#set-emailaddress)
+  - [Compare-EmailAddress](#compare-emailaddress)
+- [Validation Rules](#validation-rules)
+- [Contributing](#contributing)
+- [License](#license)
 
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://github.com/github_username/repo_name">
-    <img src="images/logo.png" alt="Logo" width="80" height="80">
-  </a>
+---
 
-<h3 align="center">project_title</h3>
+## Overview
 
-  <p align="center">
-    project_description
-    <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
-    ·
-    <a href="https://github.com/github_username/repo_name/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
-    ·
-    <a href="https://github.com/github_username/repo_name/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
-  </p>
-</div>
+Working with email addresses in PowerShell typically means passing raw strings around and hoping they are valid. This module replaces that pattern with a proper value type:
 
+```powershell
+# Create once, validated at construction time
+$email = New-EmailAddress -Address "Chris Keslar <crk4@pitt.edu>"
 
+$email.Address      # crk4@pitt.edu
+$email.DisplayName  # Chris Keslar
 
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
+# Objects flow naturally through the pipeline
+Import-Csv .\contacts.csv |
+    Select-Object -ExpandProperty Email |
+    ConvertTo-EmailAddress |
+    ConvertTo-NormalizedEmailAddress |
+    Format-EmailAddress -Format RFC5322
+```
 
+The `EmailAddress` class is **immutable**: all properties are set at construction time and are read-only. Cmdlets that appear to "modify" an address (like `Set-EmailAddress`) always return a new object — the original is never changed.
 
+---
 
-<!-- ABOUT THE PROJECT -->
-## About The Project
+## Requirements
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+- PowerShell 5.1 or PowerShell 7+
+- Windows, Linux, or macOS
 
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `github_username`, `repo_name`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
+---
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+## Installation
 
+```powershell
+Install-Module -Name EmailAddress -Scope CurrentUser
+```
 
+Or to install for all users (requires elevation):
 
-### Built With
+```powershell
+Install-Module -Name EmailAddress -Scope AllUsers
+```
 
-* [![Next][Next.js]][Next-url]
-* [![React][React.js]][React-url]
-* [![Vue][Vue.js]][Vue-url]
-* [![Angular][Angular.io]][Angular-url]
-* [![Svelte][Svelte.dev]][Svelte-url]
-* [![Laravel][Laravel.com]][Laravel-url]
-* [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-* [![JQuery][JQuery.com]][JQuery-url]
+After installation, import the module:
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+```powershell
+Import-Module EmailAddress
+```
 
+---
 
+## The EmailAddress Class
 
-<!-- GETTING STARTED -->
-## Getting Started
+The `[EmailAddress]` class is the foundation of the module. All cmdlets produce or consume `[EmailAddress]` objects.
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+### Constructing an object
 
-### Prerequisites
+You can construct directly from the class, but using `New-EmailAddress` is preferred for pipeline compatibility and better error handling.
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
+```powershell
+# From a plain address string
+$email = [EmailAddress]::new("crk4@pitt.edu")
 
-### Installation
+# From a named mailbox string (RFC 5322 format)
+$email = [EmailAddress]::new("Chris Keslar <crk4@pitt.edu>")
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/github_username/repo_name.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
+# From component parts
+$email = [EmailAddress]::FromComponents("crk4", "pitt.edu", "Chris Keslar")
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+# Non-throwing factory (returns $false on failure instead of throwing)
+$email = $null
+if ([EmailAddress]::TryFromString("crk4@pitt.edu", [ref]$email)) {
+    Write-Host $email.Address
+}
+```
 
+### Properties
 
+| Property | Type | Description |
+|---|---|---|
+| `Address` | `string` | The plain address: `crk4@pitt.edu` |
+| `DisplayName` | `string` | The display name, or empty string if none |
 
-<!-- USAGE EXAMPLES -->
-## Usage
+Both properties are read-only. Attempting to assign to them throws an error.
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+### Key methods
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+| Method | Returns | Description |
+|---|---|---|
+| `GetAddress()` | `string` | Plain address: `crk4@pitt.edu` |
+| `GetDisplayName()` | `string` | Display name, or empty string |
+| `GetLocalPart()` | `string` | Portion before `@`: `crk4` |
+| `GetDomain()` | `string` | Portion after `@`: `pitt.edu` |
+| `GetFriendlyName()` | `string` | `Chris Keslar <crk4@pitt.edu>` if display name present, otherwise plain address |
+| `ToRFC5322String()` | `string` | RFC 5322 format with display name quoted where required |
+| `ToString()` | `string` | Plain address (used in string interpolation) |
+| `Equals($other)` | `bool` | Case-insensitive equality on both address and display name |
+| `EqualsIgnoreDisplayName($other)` | `bool` | Case-insensitive equality on address only |
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+---
 
+## Cmdlets
 
+### New-EmailAddress
 
-<!-- ROADMAP -->
-## Roadmap
+Creates a new `[EmailAddress]` object. Invalid input is a **terminating error**.
 
-- [ ] Feature 1
-- [ ] Feature 2
-- [ ] Feature 3
-    - [ ] Nested Feature
+```powershell
+# From a plain address string
+New-EmailAddress -Address "crk4@pitt.edu"
 
-See the [open issues](https://github.com/github_username/repo_name/issues) for a full list of proposed features (and known issues).
+# From a named mailbox string
+New-EmailAddress -Address "Chris Keslar <crk4@pitt.edu>"
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+# From component parts
+New-EmailAddress -LocalPart "crk4" -Domain "pitt.edu" -DisplayName "Chris Keslar"
 
+# From the pipeline
+"crk4@pitt.edu", "jdoe@example.com" | New-EmailAddress
 
+# From a CSV column
+Import-Csv .\contacts.csv | Select-Object -ExpandProperty Email | New-EmailAddress
+```
 
-<!-- CONTRIBUTING -->
+---
+
+### Test-EmailAddress
+
+Tests whether strings are valid email address formats. **Never throws** — invalid input returns `$false` rather than an error.
+
+```powershell
+# Simple bool result
+Test-EmailAddress -InputObject "crk4@pitt.edu"   # $true
+Test-EmailAddress -InputObject "notanemail"       # $false
+
+# Detailed result with failure reason
+Test-EmailAddress -InputObject "notanemail" -Detailed
+# Input   : notanemail
+# IsValid : False
+# Reason  : Address must contain exactly one '@' symbol.
+
+# Pipeline: filter invalid addresses from a CSV
+Import-Csv .\contacts.csv |
+    Select-Object -ExpandProperty Email |
+    Test-EmailAddress -Detailed |
+    Where-Object { -not $_.IsValid }
+```
+
+---
+
+### ConvertTo-EmailAddress
+
+Bulk-converts strings to `[EmailAddress]` objects. Unlike `New-EmailAddress`, invalid input produces a **non-terminating error** and is skipped — the pipeline continues.
+
+```powershell
+# Mixed valid/invalid input — bad addresses are skipped
+"crk4@pitt.edu", "bad-address", "jdoe@example.com" | ConvertTo-EmailAddress
+
+# Collect errors separately without stopping the pipeline
+$addresses | ConvertTo-EmailAddress -ErrorVariable badAddresses
+
+# Treat invalid input as terminating (behaves like New-EmailAddress)
+$addresses | ConvertTo-EmailAddress -ErrorAction Stop
+```
+
+---
+
+### ConvertTo-NormalizedEmailAddress
+
+Returns new `[EmailAddress]` objects with the address portion trimmed and lowercased. The display name is preserved unchanged.
+
+```powershell
+# Normalize an object
+$email = New-EmailAddress -Address "Chris Keslar <CRK4@PITT.EDU>"
+ConvertTo-NormalizedEmailAddress -InputObject $email
+# Address: crk4@pitt.edu  DisplayName: Chris Keslar
+
+# Normalize directly from a string (convert and normalize in one step)
+ConvertTo-NormalizedEmailAddress -Address "CRK4@PITT.EDU"
+
+# Normalize a pipeline of addresses from a CSV
+Import-Csv .\contacts.csv |
+    Select-Object -ExpandProperty Email |
+    ConvertTo-NormalizedEmailAddress -Address
+```
+
+---
+
+### Format-EmailAddress
+
+Formats an `[EmailAddress]` object as a string in one of three modes.
+
+| Format | Example output |
+|---|---|
+| `Address` *(default)* | `crk4@pitt.edu` |
+| `Friendly` | `Chris Keslar <crk4@pitt.edu>` |
+| `RFC5322` | `"Keslar, Chris" <crk4@pitt.edu>` *(quoted when required)* |
+
+```powershell
+$email = New-EmailAddress -Address "Keslar, Chris <crk4@pitt.edu>"
+
+Format-EmailAddress -InputObject $email                    # crk4@pitt.edu
+Format-EmailAddress -InputObject $email -Format Friendly   # Keslar, Chris <crk4@pitt.edu>
+Format-EmailAddress -InputObject $email -Format RFC5322    # "Keslar, Chris" <crk4@pitt.edu>
+
+# Pipeline
+Import-Csv .\contacts.csv |
+    Select-Object -ExpandProperty Email |
+    New-EmailAddress |
+    Format-EmailAddress -Format RFC5322
+```
+
+---
+
+### Get-EmailAddress
+
+Extracts a single named property from an `[EmailAddress]` object as a string.
+
+```powershell
+$email = New-EmailAddress -Address "Chris Keslar <crk4@pitt.edu>"
+
+Get-EmailAddress -InputObject $email -Property Address      # crk4@pitt.edu
+Get-EmailAddress -InputObject $email -Property DisplayName  # Chris Keslar
+Get-EmailAddress -InputObject $email -Property LocalPart    # crk4
+Get-EmailAddress -InputObject $email -Property Domain       # pitt.edu
+Get-EmailAddress -InputObject $email -Property Friendly     # Chris Keslar <crk4@pitt.edu>
+Get-EmailAddress -InputObject $email -Property RFC5322      # "Chris Keslar" <crk4@pitt.edu>
+
+# Extract just the domain from every address in a CSV
+Import-Csv .\contacts.csv |
+    Select-Object -ExpandProperty Email |
+    New-EmailAddress |
+    Get-EmailAddress -Property Domain
+```
+
+---
+
+### Set-EmailAddress
+
+Returns a new `[EmailAddress]` object with one component replaced. The original object is never modified.
+
+```powershell
+$email = New-EmailAddress -Address "Chris Keslar <crk4@pitt.edu>"
+
+# Replace the full address (display name is preserved)
+Set-EmailAddress -InputObject $email -Address "crk4@example.com"
+# Result: Chris Keslar <crk4@example.com>
+
+# Replace just the display name
+Set-EmailAddress -InputObject $email -DisplayName "C. Keslar"
+# Result: C. Keslar <crk4@pitt.edu>
+
+# Remove the display name
+Set-EmailAddress -InputObject $email -DisplayName ""
+# Result: crk4@pitt.edu
+
+# Replace just the local part
+Set-EmailAddress -InputObject $email -LocalPart "ckeslar"
+# Result: Chris Keslar <ckeslar@pitt.edu>
+
+# Replace just the domain — pipeline example
+"crk4@pitt.edu", "jdoe@pitt.edu" |
+    New-EmailAddress |
+    Set-EmailAddress -Domain "example.com"
+# Results: crk4@example.com, jdoe@example.com
+```
+
+---
+
+### Compare-EmailAddress
+
+Compares two email addresses for equality. Accepts strings, named mailbox strings, or `[EmailAddress]` objects for both parameters.
+
+```powershell
+# Default: compares address and display name (case-insensitive)
+Compare-EmailAddress -ReferenceAddress "crk4@pitt.edu" -DifferenceAddress "crk4@pitt.edu"
+# $true
+
+Compare-EmailAddress `
+    -ReferenceAddress  "Chris Keslar <crk4@pitt.edu>" `
+    -DifferenceAddress "C. Keslar <crk4@pitt.edu>"
+# $false — display names differ
+
+# -IgnoreDisplayName: compare address portion only
+Compare-EmailAddress `
+    -ReferenceAddress  "Chris Keslar <crk4@pitt.edu>" `
+    -DifferenceAddress "C. Keslar <crk4@pitt.edu>" `
+    -IgnoreDisplayName
+# $true
+
+# -Detailed: returns a PSCustomObject
+Compare-EmailAddress `
+    -ReferenceAddress  "crk4@pitt.edu" `
+    -DifferenceAddress "jdoe@example.com" `
+    -Detailed
+# ReferenceAddress   : crk4@pitt.edu
+# DifferenceAddress  : jdoe@example.com
+# AreEqual           : False
+# IgnoredDisplayName : False
+
+# Pipeline: compare each incoming address against a fixed address
+$incoming | Compare-EmailAddress -DifferenceAddress "crk4@pitt.edu"
+```
+
+---
+
+## Validation Rules
+
+Validation is applied at construction time by `[EmailAddress]::GetValidationFailureReason()`. The following rules are enforced:
+
+| Rule | Detail |
+|---|---|
+| Single `@` | Exactly one `@` symbol required |
+| Local part length | 1–64 characters |
+| Local part characters | Letters, digits, and: `. ! # $ % & ' * + - / = ? ^ _ \` { \| } ~` |
+| Local part dots | Not at start, not at end, no consecutive dots |
+| Domain length | 1–255 characters |
+| Domain label length | Each label (dot-separated segment) must be 1–63 characters |
+| Domain label characters | Letters, digits, and hyphens only |
+| Domain label hyphens | Not at start or end of a label |
+| TLD | At least one dot required; TLD must be at least 2 characters |
+| Total length | Must not exceed 320 characters |
+
+> **Note:** Quoted local parts (e.g. `"john doe"@example.com`) and IP address literals (e.g. `user@[192.168.1.1]`) are intentionally not supported, as they are rarely accepted by real-world mail systems.
+
+To get a human-readable reason for a validation failure:
+
+```powershell
+[EmailAddress]::GetValidationFailureReason("user@@example.com")
+# Address must contain exactly one '@' symbol.
+
+# Or use Test-EmailAddress -Detailed for pipeline-friendly validation
+Test-EmailAddress -InputObject "user@@example.com" -Detailed
+```
+
+---
+
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are welcome. Please see [CONTRIBUTING.md](.github/CONTRIBUTING.md) for guidelines on opening issues and submitting pull requests.
 
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
+---
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the MIT License. See [LICENSE.md](LICENSE.md) for details.
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+---
 
-
-
-<!-- CONTACT -->
-## Contact
-
-Your Name - [@twitter_handle](https://twitter.com/twitter_handle) - email@email_client.com
-
-Project Link: [https://github.com/github_username/repo_name](https://github.com/github_username/repo_name)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- ACKNOWLEDGMENTS -->
-## Acknowledgments
-
-* []()
-* []()
-* []()
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[contributors-shield]: https://img.shields.io/github/contributors/github_username/repo_name.svg?style=for-the-badge
-[contributors-url]: https://github.com/github_username/repo_name/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/github_username/repo_name.svg?style=for-the-badge
-[forks-url]: https://github.com/github_username/repo_name/network/members
-[stars-shield]: https://img.shields.io/github/stars/github_username/repo_name.svg?style=for-the-badge
-[stars-url]: https://github.com/github_username/repo_name/stargazers
-[issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
-[issues-url]: https://github.com/github_username/repo_name/issues
-[license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
-[license-url]: https://github.com/github_username/repo_name/blob/master/LICENSE.txt
-[linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/linkedin_username
-[product-screenshot]: images/screenshot.png
-[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[Next-url]: https://nextjs.org/
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
-[Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
-[Vue-url]: https://vuejs.org/
-[Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
-[Angular-url]: https://angular.io/
-[Svelte.dev]: https://img.shields.io/badge/Svelte-4A4A55?style=for-the-badge&logo=svelte&logoColor=FF3E00
-[Svelte-url]: https://svelte.dev/
-[Laravel.com]: https://img.shields.io/badge/Laravel-FF2D20?style=for-the-badge&logo=laravel&logoColor=white
-[Laravel-url]: https://laravel.com
-[Bootstrap.com]: https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white
-[Bootstrap-url]: https://getbootstrap.com
-[JQuery.com]: https://img.shields.io/badge/jQuery-0769AD?style=for-the-badge&logo=jquery&logoColor=white
-[JQuery-url]: https://jquery.com 
+*Copyright © 2026 University of Pittsburgh*

@@ -1,0 +1,238 @@
+TOPIC
+    about_EmailAddress
+
+SHORT DESCRIPTION
+    Describes the EmailAddress module, which provides a strongly-typed
+    [EmailAddress] class and eight cmdlets for parsing, validating,
+    normalizing, formatting, and comparing RFC 5321/5322 email addresses.
+
+LONG DESCRIPTION
+    The EmailAddress module replaces the common pattern of passing raw email
+    address strings through a PowerShell pipeline with a proper value type.
+    Every [EmailAddress] object is validated at construction time against a
+    practical subset of RFC 5321/5322 rules, so downstream code can trust
+    that any object it receives holds a well-formed address.
+
+  DESIGN PHILOSOPHY: IMMUTABILITY
+
+    [EmailAddress] objects are immutable. All fields are set at construction
+    time and exposed only through read-only properties and getter methods.
+    No setters exist. Cmdlets that appear to modify an address — such as
+    Set-EmailAddress — always return a new [EmailAddress] instance. The
+    original object is never changed.
+
+    This means you can safely pass [EmailAddress] objects to functions,
+    store them in collections, or use them across pipeline stages without
+    worrying that something downstream will alter them.
+
+  THE NAMED MAILBOX FORMAT
+
+    The module supports two input formats throughout:
+
+      Plain address:
+          crk4@pitt.edu
+
+      Named mailbox (RFC 5322):
+          Chris Keslar <crk4@pitt.edu>
+
+    When a named mailbox string is provided, the display name and address
+    are parsed and stored separately. The address portion alone is
+    validated; the display name is stored as-is.
+
+  RFC 5321/5322 VALIDATION RULES
+
+    Validation is performed by [EmailAddress]::GetValidationFailureReason().
+    The following rules are enforced:
+
+      Total length
+          The full address string must not exceed 320 characters.
+
+      Single @ symbol
+          The address must contain exactly one @ symbol.
+
+      Local part (the portion before @)
+          - Must be between 1 and 64 characters.
+          - Allowed characters: letters, digits, and the following
+            symbols: . ! # $ % & ' * + - / = ? ^ _ ` { | } ~
+          - Must not start or end with a dot.
+          - Must not contain consecutive dots.
+
+      Domain (the portion after @)
+          - Must be between 1 and 255 characters.
+          - Must contain at least one dot (a top-level domain is required).
+          - Must not start or end with a dot or hyphen.
+          - Each dot-separated label must be 1–63 characters.
+          - Each label may contain only letters, digits, and hyphens.
+          - Each label must not start or end with a hyphen.
+          - The top-level domain (last label) must be at least 2 characters.
+
+    The following formats are intentionally NOT supported:
+
+      Quoted local parts:    "john doe"@example.com
+      IP address literals:   user@[192.168.1.1]
+
+    These forms are technically permitted by RFC 5321 but are rarely
+    accepted by real-world mail systems and are excluded by design.
+
+  GETTING A FAILURE REASON
+
+    IsValidEmailAddressFormat() returns only a bool. When you need to know
+    *why* an address is invalid, call GetValidationFailureReason() directly:
+
+        [EmailAddress]::GetValidationFailureReason("user@@example.com")
+        # Returns: "Address must contain exactly one '@' symbol."
+
+        [EmailAddress]::GetValidationFailureReason("crk4@pitt.edu")
+        # Returns: $null  (address is valid)
+
+    Because PowerShell coerces $null to an empty string on [string]-typed
+    return values, use [string]::IsNullOrEmpty() rather than a $null check:
+
+        $reason = [EmailAddress]::GetValidationFailureReason($addr)
+        if ([string]::IsNullOrEmpty($reason)) {
+            # valid
+        } else {
+            Write-Warning "Invalid address: $reason"
+        }
+
+    Test-EmailAddress -Detailed provides the same information in a
+    pipeline-friendly form:
+
+        Test-EmailAddress -InputObject "user@@example.com" -Detailed
+        # Input   : user@@example.com
+        # IsValid : False
+        # Reason  : Address must contain exactly one '@' symbol.
+
+  NEW-EMAILADDRESS VS CONVERTTO-EMAILADDRESS
+
+    The module provides two cmdlets for creating [EmailAddress] objects
+    from strings. They differ in how they handle invalid input:
+
+      New-EmailAddress
+          Produces a TERMINATING ERROR for invalid input. The pipeline
+          stops. Use this when every input is expected to be valid and
+          an invalid address represents a bug or unrecoverable condition.
+
+              # Stops on the first invalid address
+              $addresses | New-EmailAddress
+
+      ConvertTo-EmailAddress
+          Produces a NON-TERMINATING ERROR for invalid input and skips
+          that item. The pipeline continues with the remaining inputs.
+          Use this for bulk or batch processing where some inputs may be
+          malformed and you want to continue despite them.
+
+              # Skips bad addresses, continues processing
+              $addresses | ConvertTo-EmailAddress
+
+              # Collect failures separately for review
+              $valid = $addresses | ConvertTo-EmailAddress `
+                  -ErrorVariable failures `
+                  -ErrorAction SilentlyContinue
+
+              # Make invalid input terminating within ConvertTo-EmailAddress
+              $addresses | ConvertTo-EmailAddress -ErrorAction Stop
+
+    As a rule: use New-EmailAddress when constructing a single known-good
+    address, or when a failure must stop the pipeline. Use
+    ConvertTo-EmailAddress when processing a list that may contain errors.
+
+COMMON PIPELINE PATTERNS
+
+  Validate a list and report failures
+
+        "crk4@pitt.edu", "bad", "jdoe@example.com" |
+            Test-EmailAddress -Detailed |
+            Where-Object { -not $_.IsValid } |
+            ForEach-Object {
+                Write-Warning "Invalid: $($_.Input) — $($_.Reason)"
+            }
+
+  Import a CSV, skip bad addresses, normalize, and format for an API
+
+        Import-Csv .\contacts.csv |
+            Select-Object -ExpandProperty Email |
+            ConvertTo-EmailAddress -ErrorAction SilentlyContinue |
+            ConvertTo-NormalizedEmailAddress |
+            Format-EmailAddress -Format RFC5322
+
+  Validate a CSV and separate valid from invalid rows
+
+        $results = Import-Csv .\contacts.csv |
+            Select-Object -ExpandProperty Email |
+            Test-EmailAddress -Detailed
+
+        $valid   = $results | Where-Object { $_.IsValid }
+        $invalid = $results | Where-Object { -not $_.IsValid }
+
+  Bulk domain migration — replace domain for every address in a list
+
+        Import-Csv .\accounts.csv |
+            Select-Object -ExpandProperty Email |
+            New-EmailAddress |
+            Set-EmailAddress -Domain "newdomain.org"
+
+  Deduplicate a list by address, ignoring display name differences
+
+        $addresses |
+            ConvertTo-NormalizedEmailAddress |
+            Sort-Object Address -Unique
+
+  Find all addresses from a specific domain
+
+        $addresses | Where-Object { $_.Domain -eq "pitt.edu" }
+
+  Compare an incoming list against an allowlist
+
+        $incoming | Compare-EmailAddress -DifferenceAddress $allowedAddress
+
+  Extract just the local part from every address
+
+        $addresses | Get-EmailAddress -Property LocalPart
+
+CMDLET SUMMARY
+
+    New-EmailAddress
+        Creates an [EmailAddress] object from a string or component parts.
+        Invalid input is a terminating error.
+
+    Test-EmailAddress
+        Tests whether strings are valid email address formats. Never throws.
+        Returns [bool] or [PSCustomObject] with -Detailed.
+
+    ConvertTo-EmailAddress
+        Bulk-converts strings to [EmailAddress] objects. Invalid input is
+        a non-terminating error; the pipeline continues.
+
+    ConvertTo-NormalizedEmailAddress
+        Returns new [EmailAddress] objects with the address portion
+        lowercased and trimmed. Display names are preserved.
+
+    Format-EmailAddress
+        Formats an [EmailAddress] as a string: Address (plain), Friendly
+        (with display name), or RFC5322 (with quoting applied).
+
+    Get-EmailAddress
+        Extracts a single named property — Address, DisplayName, LocalPart,
+        Domain, Friendly, or RFC5322 — as a string.
+
+    Set-EmailAddress
+        Returns a new [EmailAddress] with one component replaced: -Address,
+        -DisplayName, -LocalPart, or -Domain. The original is unchanged.
+
+    Compare-EmailAddress
+        Compares two addresses for equality, with optional -IgnoreDisplayName
+        and -Detailed output.
+
+SEE ALSO
+    New-EmailAddress
+    Test-EmailAddress
+    ConvertTo-EmailAddress
+    ConvertTo-NormalizedEmailAddress
+    Format-EmailAddress
+    Get-EmailAddress
+    Set-EmailAddress
+    Compare-EmailAddress
+    https://github.com/keslar/psEmailAddress
+    https://www.rfc-editor.org/rfc/rfc5321
+    https://www.rfc-editor.org/rfc/rfc5322

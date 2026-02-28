@@ -1,0 +1,1744 @@
+<?xml version="1.0" encoding="utf-8"?>
+<helpItems xmlns:maml="http://schemas.microsoft.com/maml/2004/10" xmlns:command="http://schemas.microsoft.com/maml/dev/command/2004/10" xmlns:dev="http://schemas.microsoft.com/maml/dev/2004/10" schema="maml" xmlns="http://msh">
+  <command:command>
+    <command:details>
+      <command:name>Compare-EmailAddress</command:name>
+      <maml:description>
+        <maml:para>Compares two email addresses for equality.</maml:para>
+      </maml:description>
+      <command:verb>Compare</command:verb>
+      <command:noun>EmailAddress</command:noun>
+    </command:details>
+    <maml:description>
+      <maml:para>Compares a reference email address against a difference email address and returns a [bool] indicating whether they are equal. Two comparison modes are available:</maml:para>
+      <maml:para>Default               — compares both the address portion and the display                           name, case-insensitively. Equivalent to                           EmailAddress.Equals().</maml:para>
+      <maml:para>-IgnoreDisplayName    — compares only the address portion, ignoring any                           difference in display name. Useful when the same                           recipient may appear with different display names.                           Equivalent to EmailAddress.EqualsIgnoreDisplayName()                           and [EmailAddress]::AreEqualIgnoringDisplayName().</maml:para>
+      <maml:para>Both -ReferenceAddress and -DifferenceAddress accept either a plain address string ("user@example.com"), a named mailbox string ("Display Name &lt;user@example.com&gt;"), or an [EmailAddress] object. Strings are converted internally; invalid strings produce a terminating error.</maml:para>
+      <maml:para>-ReferenceAddress accepts pipeline input, allowing a single reference address to be compared against a fixed -DifferenceAddress across multiple pipeline inputs.</maml:para>
+      <maml:para>A -Detailed switch returns a [PSCustomObject] instead of a plain [bool], with properties showing both inputs and the comparison result.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Compare-EmailAddress</maml:name>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+          <maml:name>Detailed</maml:name>
+          <maml:description>
+            <maml:para>When specified, returns a [PSCustomObject] instead of a plain [bool].
+The object has the following properties:</maml:para>
+            <maml:para>ReferenceAddress   [string]  — the formatted reference address
+  DifferenceAddress  [string]  — the formatted difference address
+  AreEqual           [bool]    — $true if the addresses are equal
+  IgnoredDisplayName [bool]    — whether -IgnoreDisplayName was used</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="true">System.Management.Automation.SwitchParameter</command:parameterValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
+          <maml:name>DifferenceAddress</maml:name>
+          <maml:description>
+            <maml:para>The email address to compare against.
+Accepts a plain address string, named mailbox string, or EmailAddress object.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">System.Object</command:parameterValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+          <maml:name>IgnoreDisplayName</maml:name>
+          <maml:description>
+            <maml:para>When specified, only the address portion is compared.
+Display name differences
+are ignored.
+"Chris Keslar &lt;crk4@pitt.edu&gt;" and "C.
+Keslar &lt;crk4@pitt.edu&gt;"
+are considered equal under this switch.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="true">System.Management.Automation.SwitchParameter</command:parameterValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>ReferenceAddress</maml:name>
+          <maml:description>
+            <maml:para>The reference email address to compare from.
+Accepts a plain address string, named mailbox string, or EmailAddress object.
+Accepts pipeline input by value.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">System.Object</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+        <maml:name>Detailed</maml:name>
+        <maml:description>
+          <maml:para>When specified, returns a [PSCustomObject] instead of a plain [bool].
+The object has the following properties:</maml:para>
+          <maml:para>ReferenceAddress   [string]  — the formatted reference address
+  DifferenceAddress  [string]  — the formatted difference address
+  AreEqual           [bool]    — $true if the addresses are equal
+  IgnoredDisplayName [bool]    — whether -IgnoreDisplayName was used</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="true">System.Management.Automation.SwitchParameter</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
+        <maml:name>DifferenceAddress</maml:name>
+        <maml:description>
+          <maml:para>The email address to compare against.
+Accepts a plain address string, named mailbox string, or EmailAddress object.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">System.Object</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+        <maml:name>IgnoreDisplayName</maml:name>
+        <maml:description>
+          <maml:para>When specified, only the address portion is compared.
+Display name differences
+are ignored.
+"Chris Keslar &lt;crk4@pitt.edu&gt;" and "C.
+Keslar &lt;crk4@pitt.edu&gt;"
+are considered equal under this switch.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="true">System.Management.Automation.SwitchParameter</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+        <maml:name>ReferenceAddress</maml:name>
+        <maml:description>
+          <maml:para>The reference email address to compare from.
+Accepts a plain address string, named mailbox string, or EmailAddress object.
+Accepts pipeline input by value.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">System.Object</command:parameterValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>[EmailAddress]  An EmailAddress object piped to -ReferenceAddress.
+
+{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+      <command:inputType>
+        <dev:type>
+          <dev:name>System.Object</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>[PSCustomObject] When -Detailed is specified.
+
+{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>System.Boolean</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>System.Management.Automation.PSObject</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>Comparison is always case-insensitive for the address portion, regardless
+of whether -IgnoreDisplayName is used.
+
+Both parameters accept strings as a convenience.
+Strings are converted to
+EmailAddress objects internally.
+Invalid strings produce a terminating error;
+use New-EmailAddress or Test-EmailAddress beforehand to validate input if
+needed.</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>--------- EXAMPLE 1 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Compare-EmailAddress -ReferenceAddress "crk4@pitt.edu" -DifferenceAddress "crk4@pitt.edu"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns $true.
+Both plain addresses are identical.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 2 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Compare-EmailAddress `
+    -ReferenceAddress  "Chris Keslar &lt;crk4@pitt.edu&gt;" `
+    -DifferenceAddress "C. Keslar &lt;crk4@pitt.edu&gt;"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns $false.
+Addresses are equal but display names differ.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 3 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Compare-EmailAddress `
+    -ReferenceAddress  "Chris Keslar &lt;crk4@pitt.edu&gt;" `
+    -DifferenceAddress "C. Keslar &lt;crk4@pitt.edu&gt;" `
+    -IgnoreDisplayName</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns $true.
+Display name difference is ignored.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 4 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Compare-EmailAddress `
+    -ReferenceAddress  "CRK4@PITT.EDU" `
+    -DifferenceAddress "crk4@pitt.edu"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns $true.
+Comparison is case-insensitive.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 5 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Compare-EmailAddress `
+    -ReferenceAddress  "crk4@pitt.edu" `
+    -DifferenceAddress "crk4@pitt.edu" `
+    -Detailed</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns:
+  ReferenceAddress   : crk4@pitt.edu
+  DifferenceAddress  : crk4@pitt.edu
+  AreEqual           : True
+  IgnoredDisplayName : False</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 6 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>$incoming = "crk4@pitt.edu", "other@pitt.edu", "crk4@pitt.edu" | New-EmailAddress
+$incoming | Compare-EmailAddress -DifferenceAddress "crk4@pitt.edu"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Compares each piped address against "crk4@pitt.edu".
+Returns: $true, $false, $true</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version</maml:linkText>
+        <command:uri />
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command>
+    <command:details>
+      <command:name>ConvertTo-EmailAddress</command:name>
+      <maml:description>
+        <maml:para>Converts one or more strings to EmailAddress objects, skipping invalid input.</maml:para>
+      </maml:description>
+      <command:verb>ConvertTo</command:verb>
+      <command:noun>EmailAddress</command:noun>
+    </command:details>
+    <maml:description>
+      <maml:para>Attempts to convert each input string to an EmailAddress object. Unlike New-EmailAddress, invalid input does not stop the pipeline: each invalid string is reported as a non-terminating error and skipped, allowing the remaining inputs to be processed.</maml:para>
+      <maml:para>This makes ConvertTo-EmailAddress suitable for bulk or batch conversions where some inputs may be malformed — for example, importing a list of addresses from a CSV and discarding the bad ones.</maml:para>
+      <maml:para>Input may be supplied directly via -InputObject or piped in. Only plain address strings ("user@example.com") and named mailbox strings ("Display Name &lt;user@example.com&gt;") are accepted; component-based construction is not supported. Use New-EmailAddress -LocalPart/-Domain if you need to build addresses from parts.</maml:para>
+      <maml:para>Validation is performed by the EmailAddress class against a practical subset of RFC 5321/5322 rules.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>ConvertTo-EmailAddress</maml:name>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>InputObject</maml:name>
+          <maml:description>
+            <maml:para>One or more plain address or named mailbox strings to convert.
+Accepts pipeline input by value.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">System.String[]</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+        <maml:name>InputObject</maml:name>
+        <maml:description>
+          <maml:para>One or more plain address or named mailbox strings to convert.
+Accepts pipeline input by value.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">System.String[]</command:parameterValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+      <command:inputType>
+        <dev:type>
+          <dev:name>System.String</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>skipped and reported via Write-Error.
+
+{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>EmailAddress</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>The key difference between ConvertTo-EmailAddress and New-EmailAddress:
+
+  New-EmailAddress      — single-object creation; invalid input is a
+                          terminating error that stops the pipeline.
+
+  ConvertTo-EmailAddress — bulk conversion; invalid input is a
+                           non-terminating error that skips the item
+                           and continues.
+
+To treat invalid input as terminating within ConvertTo-EmailAddress,
+use -ErrorAction Stop.</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>--------- EXAMPLE 1 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>ConvertTo-EmailAddress -InputObject "crk4@pitt.edu"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Converts a single address string.
+Returns one EmailAddress object.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 2 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"crk4@pitt.edu", "bad-address", "jdoe@example.com" | ConvertTo-EmailAddress</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Converts a mixed list.
+The valid addresses are returned as EmailAddress
+objects; "bad-address" is silently skipped (or reported if -ErrorVariable
+or -ErrorAction is set).</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 3 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"crk4@pitt.edu", "bad-address" | ConvertTo-EmailAddress -ErrorAction Stop</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Converts addresses from the pipeline but stops on the first invalid input,
+behaving like New-EmailAddress.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 4 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Import-Csv .\contacts.csv |
+    Select-Object -ExpandProperty Email |
+    ConvertTo-EmailAddress -ErrorVariable badAddresses</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Converts a CSV column of addresses.
+Invalid entries are collected in
+$badAddresses for inspection without interrupting the pipeline.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 5 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>$addresses = "crk4@pitt.edu", "jdoe@example.com", "notvalid"
+$valid = $addresses | ConvertTo-EmailAddress -ErrorAction SilentlyContinue
+$valid.Count   # 2 — only the valid ones</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Suppresses error output and collects only the successfully converted objects.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version</maml:linkText>
+        <command:uri />
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command>
+    <command:details>
+      <command:name>ConvertTo-NormalizedEmailAddress</command:name>
+      <maml:description>
+        <maml:para>Returns a new EmailAddress object with the address portion normalized to lowercase.</maml:para>
+      </maml:description>
+      <command:verb>ConvertTo</command:verb>
+      <command:noun>NormalizedEmailAddress</command:noun>
+    </command:details>
+    <maml:description>
+      <maml:para>Normalizes the address portion of each input EmailAddress object by trimming whitespace and converting it to lowercase. Returns a new EmailAddress object for each input; the original is not modified.</maml:para>
+      <maml:para>Normalization affects only the address portion (local-part@domain). The display name, if present, is preserved exactly as-is.</maml:para>
+      <maml:para>Two input modes are supported:</maml:para>
+      <maml:para>-InputObject  — accepts one or more [EmailAddress] objects directly or                   via the pipeline.</maml:para>
+      <maml:para>-Address      — accepts one or more plain address or named mailbox strings.                   Each string is first converted to an EmailAddress object,                   then normalized. Invalid strings are reported as non-terminating                   errors and skipped, consistent with ConvertTo-EmailAddress.</maml:para>
+      <maml:para>This cmdlet is useful for ensuring consistency before comparison, deduplication, storage, or display — for example, normalizing a batch of addresses imported from a case-inconsistent source before inserting them into a database.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>ConvertTo-NormalizedEmailAddress</maml:name>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>InputObject</maml:name>
+          <maml:description>
+            <maml:para>One or more EmailAddress objects to normalize.
+Accepts pipeline input by value.
+Used with parameter set: FromEmailAddress.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">EmailAddress[]</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+      <command:syntaxItem>
+        <maml:name>ConvertTo-NormalizedEmailAddress</maml:name>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>Address</maml:name>
+          <maml:description>
+            <maml:para>One or more plain address or named mailbox strings to normalize.
+Each string is converted to an EmailAddress object before normalization.
+Invalid strings produce a non-terminating error and are skipped.
+Accepts pipeline input by value.
+Used with parameter set: FromString.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">System.String[]</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+        <maml:name>Address</maml:name>
+        <maml:description>
+          <maml:para>One or more plain address or named mailbox strings to normalize.
+Each string is converted to an EmailAddress object before normalization.
+Invalid strings produce a non-terminating error and are skipped.
+Accepts pipeline input by value.
+Used with parameter set: FromString.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">System.String[]</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+        <maml:name>InputObject</maml:name>
+        <maml:description>
+          <maml:para>One or more EmailAddress objects to normalize.
+Accepts pipeline input by value.
+Used with parameter set: FromEmailAddress.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">EmailAddress[]</command:parameterValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>[string]        Via -Address or pipeline (FromString set).
+
+{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+      <command:inputType>
+        <dev:type>
+          <dev:name>EmailAddress</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+      <command:inputType>
+        <dev:type>
+          <dev:name>System.String</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>EmailAddress</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>Only the address portion is normalized.
+Display names are never modified.
+
+When using the -Address parameter set, invalid strings produce a
+non-terminating error and are skipped.
+Use -ErrorAction Stop to treat
+invalid strings as terminating errors.
+
+ConvertTo-NormalizedEmailAddress always returns a new [EmailAddress] object.
+The input object is never modified (the class is immutable).</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>--------- EXAMPLE 1 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>$email = New-EmailAddress -Address "CRK4@PITT.EDU"
+ConvertTo-NormalizedEmailAddress -InputObject $email</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns a new EmailAddress with address "crk4@pitt.edu".</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 2 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+ConvertTo-NormalizedEmailAddress -InputObject $email</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns a new EmailAddress with address "crk4@pitt.edu" and display
+name "Chris Keslar" (display name is preserved unchanged).</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 3 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>ConvertTo-NormalizedEmailAddress -Address "CRK4@PITT.EDU"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Converts and normalizes a plain address string in one step.
+Returns a new EmailAddress with address "crk4@pitt.edu".</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 4 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Converts and normalizes a named mailbox string in one step.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 5 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>$emails = "CRK4@PITT.EDU", "JDOE@EXAMPLE.COM" | New-EmailAddress
+$emails | ConvertTo-NormalizedEmailAddress</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Normalizes a pipeline of EmailAddress objects.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 6 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"CRK4@PITT.EDU", "JDOE@EXAMPLE.COM" | ConvertTo-NormalizedEmailAddress -Address</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Normalizes a pipeline of address strings directly without a separate
+New-EmailAddress step.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 7 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Import-Csv .\contacts.csv |
+    Select-Object -ExpandProperty Email |
+    ConvertTo-NormalizedEmailAddress -Address</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Normalizes all email addresses from a CSV column in a single pipeline.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version</maml:linkText>
+        <command:uri />
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command>
+    <command:details>
+      <command:name>Format-EmailAddress</command:name>
+      <maml:description>
+        <maml:para>Formats an EmailAddress object as a string in one of three standard formats.</maml:para>
+      </maml:description>
+      <command:verb>Format</command:verb>
+      <command:noun>EmailAddress</command:noun>
+    </command:details>
+    <maml:description>
+      <maml:para>Returns a formatted string representation of one or more EmailAddress objects. Three formats are available via the -Format parameter:</maml:para>
+      <maml:para>Address  — plain address only: "crk4@pitt.edu"              Equivalent to EmailAddress.ToString().              This is the default.</maml:para>
+      <maml:para>Friendly — display name and address if a display name is present, otherwise              plain address: "Chris Keslar &lt;crk4@pitt.edu&gt;" or "crk4@pitt.edu"              Equivalent to EmailAddress.GetFriendlyName().</maml:para>
+      <maml:para>RFC5322  — RFC 5322-compliant format. The display name is quoted if it              contains special characters or whitespace; embedded double quotes              in the display name are escaped:                "Chris Keslar" &lt;crk4@pitt.edu&gt;      (space requires quoting)                ChrisKeslar &lt;crk4@pitt.edu&gt;          (no quoting needed)                "Keslar, Chris" &lt;crk4@pitt.edu&gt;      (comma requires quoting)              Falls back to plain address when no display name is present.              Equivalent to EmailAddress.ToRFC5322String().</maml:para>
+      <maml:para>Accepts pipeline input. Returns one [string] per input object.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Format-EmailAddress</maml:name>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
+          <maml:name>Format</maml:name>
+          <maml:description>
+            <maml:para>The output format.
+Must be one of: Address, Friendly, RFC5322.
+Defaults to Address.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="true">System.String</command:parameterValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>InputObject</maml:name>
+          <maml:description>
+            <maml:para>One or more EmailAddress objects to format.
+Accepts pipeline input by value.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">EmailAddress</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
+        <maml:name>Format</maml:name>
+        <maml:description>
+          <maml:para>The output format.
+Must be one of: Address, Friendly, RFC5322.
+Defaults to Address.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="true">System.String</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+        <maml:name>InputObject</maml:name>
+        <maml:description>
+          <maml:para>One or more EmailAddress objects to format.
+Accepts pipeline input by value.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">EmailAddress</command:parameterValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+      <command:inputType>
+        <dev:type>
+          <dev:name>EmailAddress</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>System.String</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>Format-EmailAddress always requires an [EmailAddress] object as input.
+To format a raw string, first convert it with New-EmailAddress or
+ConvertTo-EmailAddress.
+
+The three formats differ only when a display name is present:
+  - Address  always strips the display name.
+  - Friendly includes the display name as-is.
+  - RFC5322  includes the display name, quoting it if required by the standard.
+
+When no display name is set on the EmailAddress object, all three formats
+produce identical output — the plain address string.</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>--------- EXAMPLE 1 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+Format-EmailAddress -InputObject $email</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns: crk4@pitt.edu</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 2 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+Format-EmailAddress -InputObject $email -Format Friendly</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns: Chris Keslar &lt;crk4@pitt.edu&gt;</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 3 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+Format-EmailAddress -InputObject $email -Format RFC5322</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns: "Chris Keslar" &lt;crk4@pitt.edu&gt;</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 4 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+Format-EmailAddress -InputObject $email -Format RFC5322</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns: "Keslar, Chris" &lt;crk4@pitt.edu&gt;</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 5 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>" | New-EmailAddress
+$emails | Format-EmailAddress -Format Friendly</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Formats a pipeline of EmailAddress objects.
+Returns one string per object.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 6 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Import-Csv .\contacts.csv |
+    Select-Object -ExpandProperty Email |
+    New-EmailAddress |
+    Format-EmailAddress -Format RFC5322</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Converts a CSV column of addresses to RFC 5322 format strings.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version</maml:linkText>
+        <command:uri />
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command>
+    <command:details>
+      <command:name>Get-EmailAddress</command:name>
+      <maml:description>
+        <maml:para>Retrieves a specific property value from an EmailAddress object.</maml:para>
+      </maml:description>
+      <command:verb>Get</command:verb>
+      <command:noun>EmailAddress</command:noun>
+    </command:details>
+    <maml:description>
+      <maml:para>Extracts and returns a single named property from one or more EmailAddress objects as a string. This cmdlet provides a consistent, discoverable way to read any property of an EmailAddress without calling instance methods directly.</maml:para>
+      <maml:para>The -Property parameter controls which value is returned:</maml:para>
+      <maml:para>Address     — the plain address string ("crk4@pitt.edu").                 Equivalent to EmailAddress.GetAddress().</maml:para>
+      <maml:para>DisplayName — the display name, or empty string if none is set.                 Equivalent to EmailAddress.GetDisplayName().</maml:para>
+      <maml:para>LocalPart   — the portion of the address before the @ symbol ("crk4").                 Equivalent to EmailAddress.GetLocalPart().</maml:para>
+      <maml:para>Domain      — the domain portion of the address ("pitt.edu").                 Equivalent to EmailAddress.GetDomain().</maml:para>
+      <maml:para>Friendly    — the named mailbox string if a display name is present,                 otherwise the plain address. ("Chris Keslar &lt;crk4@pitt.edu&gt;")                 Equivalent to EmailAddress.GetFriendlyName().</maml:para>
+      <maml:para>RFC5322     — RFC 5322-compliant format with quoting applied to the                 display name where required.                 Equivalent to EmailAddress.ToRFC5322String().</maml:para>
+      <maml:para>Accepts pipeline input. Returns one [string] per input object.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Get-EmailAddress</maml:name>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>InputObject</maml:name>
+          <maml:description>
+            <maml:para>One or more EmailAddress objects to read from.
+Accepts pipeline input by value.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">EmailAddress</command:parameterValue>
+        </command:parameter>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
+          <maml:name>Property</maml:name>
+          <maml:description>
+            <maml:para>The property to retrieve.
+Must be one of:
+Address, DisplayName, LocalPart, Domain, Friendly, RFC5322.
+Defaults to Address.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="true">System.String</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+        <maml:name>InputObject</maml:name>
+        <maml:description>
+          <maml:para>One or more EmailAddress objects to read from.
+Accepts pipeline input by value.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">EmailAddress</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
+        <maml:name>Property</maml:name>
+        <maml:description>
+          <maml:para>The property to retrieve.
+Must be one of:
+Address, DisplayName, LocalPart, Domain, Friendly, RFC5322.
+Defaults to Address.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="true">System.String</command:parameterValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+      <command:inputType>
+        <dev:type>
+          <dev:name>EmailAddress</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>System.String</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>Get-EmailAddress reads from an [EmailAddress] object.
+To read from a raw
+string, first convert it with New-EmailAddress or ConvertTo-EmailAddress.
+
+The Address and Friendly properties correspond to the two format modes of
+Format-EmailAddress.
+Use Format-EmailAddress when formatting is the primary
+concern; use Get-EmailAddress when extracting a specific structural component
+such as LocalPart or Domain.</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>--------- EXAMPLE 1 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+Get-EmailAddress -InputObject $email -Property Address</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns: crk4@pitt.edu</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 2 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+Get-EmailAddress -InputObject $email -Property DisplayName</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns: Chris Keslar</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 3 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>$email = New-EmailAddress -Address "crk4@pitt.edu"
+Get-EmailAddress -InputObject $email -Property LocalPart</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns: crk4</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 4 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>$email = New-EmailAddress -Address "crk4@pitt.edu"
+Get-EmailAddress -InputObject $email -Property Domain</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns: pitt.edu</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 5 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+Get-EmailAddress -InputObject $email -Property Friendly</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns: Chris Keslar &lt;crk4@pitt.edu&gt;</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 6 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+Get-EmailAddress -InputObject $email -Property RFC5322</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns: "Keslar, Chris" &lt;crk4@pitt.edu&gt;</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 7 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"crk4@pitt.edu", "jdoe@example.com" |
+    New-EmailAddress |
+    Get-EmailAddress -Property Domain</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns the domain of each address in the pipeline: pitt.edu, example.com</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version</maml:linkText>
+        <command:uri />
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command>
+    <command:details>
+      <command:name>New-EmailAddress</command:name>
+      <maml:description>
+        <maml:para>Creates a new EmailAddress object.</maml:para>
+      </maml:description>
+      <command:verb>New</command:verb>
+      <command:noun>EmailAddress</command:noun>
+    </command:details>
+    <maml:description>
+      <maml:para>Creates an EmailAddress object from either a full address string or from individual components (local part, domain, and optional display name).</maml:para>
+      <maml:para>Two parameter sets are supported:</maml:para>
+      <maml:para>FromString    — accepts a plain address ("user@example.com") or a named                   mailbox string ("Display Name &lt;user@example.com&gt;").                   Accepts pipeline input.</maml:para>
+      <maml:para>FromComponents — accepts the local part, domain, and an optional display                    name as separate parameters, and assembles the address                    internally.</maml:para>
+      <maml:para>Validation is performed by the EmailAddress class at construction time against a practical subset of RFC 5321/5322 rules. Invalid input results in a terminating error.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>New-EmailAddress</maml:name>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>Address</maml:name>
+          <maml:description>
+            <maml:para>A plain email address string ("user@example.com") or a named mailbox string
+in RFC 5322 format ("Display Name &lt;user@example.com&gt;").</maml:para>
+            <maml:para>Accepts pipeline input by value.
+Used with parameter set: FromString.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+      <command:syntaxItem>
+        <maml:name>New-EmailAddress</maml:name>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="2" aliases="none">
+          <maml:name>DisplayName</maml:name>
+          <maml:description>
+            <maml:para>The optional human-readable name associated with the address
+(e.g.
+"Chris Keslar").
+When supplied the output object will format as
+"DisplayName &lt;LocalPart@Domain&gt;".
+Used with parameter set: FromComponents.</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="true">System.String</command:parameterValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
+          <maml:name>Domain</maml:name>
+          <maml:description>
+            <maml:para>The domain portion of the email address (e.g.
+"pitt.edu").
+Used with parameter set: FromComponents.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>LocalPart</maml:name>
+          <maml:description>
+            <maml:para>The portion of the email address before the @ symbol (e.g.
+"crk4").
+Used with parameter set: FromComponents.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+        <maml:name>Address</maml:name>
+        <maml:description>
+          <maml:para>A plain email address string ("user@example.com") or a named mailbox string
+in RFC 5322 format ("Display Name &lt;user@example.com&gt;").</maml:para>
+          <maml:para>Accepts pipeline input by value.
+Used with parameter set: FromString.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="2" aliases="none">
+        <maml:name>DisplayName</maml:name>
+        <maml:description>
+          <maml:para>The optional human-readable name associated with the address
+(e.g.
+"Chris Keslar").
+When supplied the output object will format as
+"DisplayName &lt;LocalPart@Domain&gt;".
+Used with parameter set: FromComponents.</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="true">System.String</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="1" aliases="none">
+        <maml:name>Domain</maml:name>
+        <maml:description>
+          <maml:para>The domain portion of the email address (e.g.
+"pitt.edu").
+Used with parameter set: FromComponents.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+        <maml:name>LocalPart</maml:name>
+        <maml:description>
+          <maml:para>The portion of the email address before the @ symbol (e.g.
+"crk4").
+Used with parameter set: FromComponents.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+      <command:inputType>
+        <dev:type>
+          <dev:name>System.String</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>EmailAddress</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>This cmdlet wraps the EmailAddress class constructor and static factory
+methods.
+Invalid input produces a terminating error; use a try/catch block
+or -ErrorAction if you need to handle failures without stopping the pipeline.</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>--------- EXAMPLE 1 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>New-EmailAddress -Address "crk4@pitt.edu"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Creates an EmailAddress from a plain address string with no display name.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 2 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Creates an EmailAddress from a named mailbox string.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 3 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>New-EmailAddress -LocalPart "crk4" -Domain "pitt.edu"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Creates an EmailAddress from component parts with no display name.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 4 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>New-EmailAddress -LocalPart "crk4" -Domain "pitt.edu" -DisplayName "Chris Keslar"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Creates an EmailAddress from component parts with a display name.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 5 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"crk4@pitt.edu", "jdoe@example.com" | New-EmailAddress</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Creates EmailAddress objects from a pipeline of address strings.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 6 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Import-Csv .\contacts.csv | Select-Object -ExpandProperty Email | New-EmailAddress</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Creates EmailAddress objects from a column of email addresses in a CSV file.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version</maml:linkText>
+        <command:uri />
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command>
+    <command:details>
+      <command:name>Set-EmailAddress</command:name>
+      <maml:description>
+        <maml:para>Returns a new EmailAddress object with one component replaced.</maml:para>
+      </maml:description>
+      <command:verb>Set</command:verb>
+      <command:noun>EmailAddress</command:noun>
+    </command:details>
+    <maml:description>
+      <maml:para>Because EmailAddress objects are immutable, Set-EmailAddress does not modify the input object. Instead it returns a new EmailAddress object with the specified component replaced and all other components preserved from the original.</maml:para>
+      <maml:para>Exactly one of the following mutually exclusive parameters must be supplied to specify which component to replace:</maml:para>
+      <maml:para>-Address      — replaces the entire address portion (local-part@domain).                   The display name from the original is preserved.</maml:para>
+      <maml:para>-DisplayName  — replaces the display name only.                   The address portion from the original is preserved.                   Supplying an empty string removes the display name.</maml:para>
+      <maml:para>-LocalPart    — replaces the local part of the address (before the @).                   The domain and display name from the original are preserved.</maml:para>
+      <maml:para>-Domain       — replaces the domain portion of the address (after the @).                   The local part and display name from the original are preserved.</maml:para>
+      <maml:para>Accepts pipeline input on -InputObject. Returns one new [EmailAddress] per input. Invalid replacements produce a terminating error.</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Set-EmailAddress</maml:name>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+          <maml:name>Address</maml:name>
+          <maml:description>
+            <maml:para>The new plain address string (local-part@domain) to use.
+The display name from the original object is preserved.
+Mutually exclusive with -DisplayName, -LocalPart, and -Domain.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>InputObject</maml:name>
+          <maml:description>
+            <maml:para>The EmailAddress object to copy with a modified component.
+Accepts pipeline input by value.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">EmailAddress</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+      <command:syntaxItem>
+        <maml:name>Set-EmailAddress</maml:name>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+          <maml:name>DisplayName</maml:name>
+          <maml:description>
+            <maml:para>The new display name to use.
+Supply an empty string to remove the display name.
+The address portion from the original object is preserved.
+Mutually exclusive with -Address, -LocalPart, and -Domain.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>InputObject</maml:name>
+          <maml:description>
+            <maml:para>The EmailAddress object to copy with a modified component.
+Accepts pipeline input by value.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">EmailAddress</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+      <command:syntaxItem>
+        <maml:name>Set-EmailAddress</maml:name>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>InputObject</maml:name>
+          <maml:description>
+            <maml:para>The EmailAddress object to copy with a modified component.
+Accepts pipeline input by value.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">EmailAddress</command:parameterValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+          <maml:name>LocalPart</maml:name>
+          <maml:description>
+            <maml:para>The new local part (the portion before the @) to use.
+The domain and display name from the original object are preserved.
+Mutually exclusive with -Address, -DisplayName, and -Domain.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+      <command:syntaxItem>
+        <maml:name>Set-EmailAddress</maml:name>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+          <maml:name>Domain</maml:name>
+          <maml:description>
+            <maml:para>The new domain portion (the portion after the @) to use.
+The local part and display name from the original object are preserved.
+Mutually exclusive with -Address, -DisplayName, and -LocalPart.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>InputObject</maml:name>
+          <maml:description>
+            <maml:para>The EmailAddress object to copy with a modified component.
+Accepts pipeline input by value.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">EmailAddress</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+        <maml:name>Address</maml:name>
+        <maml:description>
+          <maml:para>The new plain address string (local-part@domain) to use.
+The display name from the original object is preserved.
+Mutually exclusive with -DisplayName, -LocalPart, and -Domain.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+        <maml:name>DisplayName</maml:name>
+        <maml:description>
+          <maml:para>The new display name to use.
+Supply an empty string to remove the display name.
+The address portion from the original object is preserved.
+Mutually exclusive with -Address, -LocalPart, and -Domain.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+        <maml:name>Domain</maml:name>
+        <maml:description>
+          <maml:para>The new domain portion (the portion after the @) to use.
+The local part and display name from the original object are preserved.
+Mutually exclusive with -Address, -DisplayName, and -LocalPart.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+        <maml:name>InputObject</maml:name>
+        <maml:description>
+          <maml:para>The EmailAddress object to copy with a modified component.
+Accepts pipeline input by value.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">EmailAddress</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+        <maml:name>LocalPart</maml:name>
+        <maml:description>
+          <maml:para>The new local part (the portion before the @) to use.
+The domain and display name from the original object are preserved.
+Mutually exclusive with -Address, -DisplayName, and -Domain.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">System.String</command:parameterValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+      <command:inputType>
+        <dev:type>
+          <dev:name>EmailAddress</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>EmailAddress</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>Set-EmailAddress never modifies the input object.
+It always returns a new
+[EmailAddress] instance.
+The original object is unchanged.
+
+Exactly one replacement parameter must be supplied.
+Supplying none or more
+than one produces a parameter binding error.</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>--------- EXAMPLE 1 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+Set-EmailAddress -InputObject $email -Address "crk4@example.com"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns a new EmailAddress: Chris Keslar &lt;crk4@example.com&gt;
+The display name "Chris Keslar" is preserved.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 2 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>$email = New-EmailAddress -Address "crk4@pitt.edu"
+Set-EmailAddress -InputObject $email -DisplayName "Chris Keslar"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns a new EmailAddress: Chris Keslar &lt;crk4@pitt.edu&gt;</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 3 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+Set-EmailAddress -InputObject $email -DisplayName ""</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns a new EmailAddress: crk4@pitt.edu
+The display name is removed.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 4 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+Set-EmailAddress -InputObject $email -LocalPart "ckeslar"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns a new EmailAddress: Chris Keslar &lt;ckeslar@pitt.edu&gt;
+The domain "pitt.edu" and display name are preserved.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 5 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"
+Set-EmailAddress -InputObject $email -Domain "example.com"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns a new EmailAddress: Chris Keslar &lt;crk4@example.com&gt;
+The local part "crk4" and display name are preserved.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 6 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"crk4@pitt.edu", "jdoe@pitt.edu" |
+    New-EmailAddress |
+    Set-EmailAddress -Domain "example.com"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns two new EmailAddress objects with the domain replaced:
+crk4@example.com, jdoe@example.com</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version</maml:linkText>
+        <command:uri />
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+  <command:command>
+    <command:details>
+      <command:name>Test-EmailAddress</command:name>
+      <maml:description>
+        <maml:para>Tests whether one or more strings are valid email address formats.</maml:para>
+      </maml:description>
+      <command:verb>Test</command:verb>
+      <command:noun>EmailAddress</command:noun>
+    </command:details>
+    <maml:description>
+      <maml:para>Tests each input string against the RFC 5321/5322 validation rules implemented by the EmailAddress class and returns a result for each input.</maml:para>
+      <maml:para>Two output modes are supported:</maml:para>
+      <maml:para>Default  — returns a [bool] for each input: $true if the address is              valid, $false otherwise. Suitable for simple conditional              checks and pipeline filtering.</maml:para>
+      <maml:para>Detailed — returns a [PSCustomObject] for each input containing the              original input string, a IsValid flag, and a Reason              explaining why the address is invalid (or empty if valid).              Suitable for batch validation reports.</maml:para>
+      <maml:para>Accepts plain address strings ("user@example.com"), named mailbox strings ("Display Name &lt;user@example.com&gt;"), and [EmailAddress] objects. Accepts pipeline input.</maml:para>
+      <maml:para>This cmdlet never throws. Invalid or empty input always returns $false (or a Detailed result with IsValid = $false) rather than an error.</maml:para>
+      <maml:para>Validation rules applied by the EmailAddress class: - Must contain exactly one @ symbol - Local part: 1–64 characters; letters, digits, and special characters   per RFC 5321 practical subset - Local part: dots not allowed at start, end, or consecutively - Domain: 1–255 characters; labels separated by dots - Domain: each label 1–63 characters; letters, digits, and hyphens only - Domain: labels may not start or end with a hyphen - Domain: must contain at least one dot (TLD required) - Domain: TLD must be at least 2 characters - Total length must not exceed 320 characters</maml:para>
+    </maml:description>
+    <command:syntax>
+      <command:syntaxItem>
+        <maml:name>Test-EmailAddress</maml:name>
+        <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+          <maml:name>Detailed</maml:name>
+          <maml:description>
+            <maml:para>When specified, returns a [PSCustomObject] for each input instead of a
+[bool].
+The object has three properties:</maml:para>
+            <maml:para>Input   [string]  — the original input value
+  IsValid [bool]    — $true if the address passed validation
+  Reason  [string]  — a description of why the address is invalid,
+                      or an empty string if it is valid</maml:para>
+          </maml:description>
+          <command:parameterValue required="false" variableLength="true">System.Management.Automation.SwitchParameter</command:parameterValue>
+        </command:parameter>
+        <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+          <maml:name>InputObject</maml:name>
+          <maml:description>
+            <maml:para>One or more plain address strings, named mailbox strings, or EmailAddress
+objects to test.
+Accepts pipeline input by value.</maml:para>
+          </maml:description>
+          <command:parameterValue required="true" variableLength="true">System.Object</command:parameterValue>
+        </command:parameter>
+      </command:syntaxItem>
+    </command:syntax>
+    <command:parameters>
+      <command:parameter required="false" variableLength="false" globbing="false" pipelineInput="false" position="Named" aliases="none">
+        <maml:name>Detailed</maml:name>
+        <maml:description>
+          <maml:para>When specified, returns a [PSCustomObject] for each input instead of a
+[bool].
+The object has three properties:</maml:para>
+          <maml:para>Input   [string]  — the original input value
+  IsValid [bool]    — $true if the address passed validation
+  Reason  [string]  — a description of why the address is invalid,
+                      or an empty string if it is valid</maml:para>
+        </maml:description>
+        <command:parameterValue required="false" variableLength="true">System.Management.Automation.SwitchParameter</command:parameterValue>
+      </command:parameter>
+      <command:parameter required="true" variableLength="false" globbing="false" pipelineInput="false" position="0" aliases="none">
+        <maml:name>InputObject</maml:name>
+        <maml:description>
+          <maml:para>One or more plain address strings, named mailbox strings, or EmailAddress
+objects to test.
+Accepts pipeline input by value.</maml:para>
+        </maml:description>
+        <command:parameterValue required="true" variableLength="true">System.Object</command:parameterValue>
+      </command:parameter>
+    </command:parameters>
+    <command:inputTypes>
+      <command:inputType>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>[EmailAddress]  An existing EmailAddress object.
+
+{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+      <command:inputType>
+        <dev:type>
+          <dev:name>System.Object</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:inputType>
+    </command:inputTypes>
+    <command:returnValues>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>[</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>[PSCustomObject] One object per input when -Detailed is specified.
+
+{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>System.Boolean</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+      <command:returnValue>
+        <dev:type>
+          <dev:name>System.Management.Automation.PSObject</dev:name>
+        </dev:type>
+        <maml:description>
+          <maml:para>{{ Fill in the Description }}</maml:para>
+        </maml:description>
+      </command:returnValue>
+    </command:returnValues>
+    <maml:alertSet>
+      <maml:alert>
+        <maml:para>Test-EmailAddress never throws regardless of input.
+Empty strings, nulls,
+and malformed addresses all return $false or a Detailed result with
+IsValid = $false.
+
+To create an EmailAddress object from a validated string, pipe the result
+of Test-EmailAddress -Detailed through Where-Object { $_.IsValid } and
+then pass the Input property to New-EmailAddress.</maml:para>
+      </maml:alert>
+    </maml:alertSet>
+    <command:examples>
+      <command:example>
+        <maml:title>--------- EXAMPLE 1 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Test-EmailAddress -InputObject "crk4@pitt.edu"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns $true.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 2 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Test-EmailAddress -InputObject "notanemail"</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns $false.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 3 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Test-EmailAddress -InputObject "crk4@pitt.edu" -Detailed</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns:
+  Input   : crk4@pitt.edu
+  IsValid : True
+  Reason  :</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 4 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Test-EmailAddress -InputObject "notanemail" -Detailed</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns:
+  Input   : notanemail
+  IsValid : False
+  Reason  : Address does not match a valid email format.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 5 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"crk4@pitt.edu", "bad", "jdoe@example.com" | Test-EmailAddress</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns: $true, $false, $true</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 6 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>"crk4@pitt.edu", "bad", "jdoe@example.com" | Test-EmailAddress -Detailed</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Returns one PSCustomObject per input, each with Input, IsValid, and Reason.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 7 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>Import-Csv .\contacts.csv |
+    Select-Object -ExpandProperty Email |
+    Test-EmailAddress -Detailed |
+    Where-Object { -not $_.IsValid }</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Reports all invalid addresses from a CSV file.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+      <command:example>
+        <maml:title>--------- EXAMPLE 8 ---------</maml:title>
+        <maml:introduction>
+          <maml:para>$email = New-EmailAddress -Address "crk4@pitt.edu"
+Test-EmailAddress -InputObject $email</maml:para>
+          <maml:para>&#x80;</maml:para>
+          <maml:para>Tests an existing EmailAddress object.
+Returns $true.</maml:para>
+        </maml:introduction>
+        <dev:code />
+        <dev:remarks />
+      </command:example>
+    </command:examples>
+    <command:relatedLinks>
+      <maml:navigationLink>
+        <maml:linkText>Online Version</maml:linkText>
+        <command:uri />
+      </maml:navigationLink>
+    </command:relatedLinks>
+  </command:command>
+</helpItems>
