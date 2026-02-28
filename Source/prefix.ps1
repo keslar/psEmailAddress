@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-    
+   
 .DESCRIPTION
 
 .NOTES
@@ -13,11 +13,4 @@
 #>
 ###############################################################################
 ## CONSTANTS and Script Variables
-$script:cacheEmailAddressDataDirectory = Join-Path -Path $PSScriptRoot -ChildPath "Data"
-
-
 ###############################################################################
-## Update the data directory if the environment variable is set
-if ($env:EMAILADDRESS_DATA_DIR) {
-    $script:cacheEmailAddressDataDirectory = $env:EMAILADDRESS_DATA_DIR
-}
