@@ -1,6 +1,6 @@
-<#
+﻿<#
 .SYNOPSIS
-   
+
 .DESCRIPTION
 
 .NOTES
