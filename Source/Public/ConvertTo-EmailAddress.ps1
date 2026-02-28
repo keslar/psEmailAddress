@@ -1,4 +1,4 @@
-<#
+﻿<#
     .SYNOPSIS
         Converts one or more strings to EmailAddress objects, skipping invalid input.
 

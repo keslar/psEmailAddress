@@ -1,4 +1,4 @@
-<#
+﻿<#
     .SYNOPSIS
         Formats an EmailAddress object as a string in one of three standard formats.
 

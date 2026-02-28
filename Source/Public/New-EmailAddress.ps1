@@ -1,4 +1,4 @@
-<#
+﻿<#
     .SYNOPSIS
         Creates a new EmailAddress object.
 
@@ -83,6 +83,10 @@
         or -ErrorAction if you need to handle failures without stopping the pipeline.
 #>
 function New-EmailAddress {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions', '',
+        Justification = 'New-EmailAddress is a pure factory that constructs and returns a value object. It does not modify system state.'
+    )]
     [CmdletBinding(DefaultParameterSetName = 'FromString')]
     [OutputType([EmailAddress])]
     param (

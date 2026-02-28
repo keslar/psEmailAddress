@@ -1,4 +1,4 @@
-<#
+﻿<#
     .SYNOPSIS
         Returns a new EmailAddress object with one component replaced.
 
@@ -107,6 +107,10 @@
         than one produces a parameter binding error.
 #>
 function Set-EmailAddress {
+    [Diagnostics.CodeAnalysis.SuppressMessageAttribute(
+        'PSUseShouldProcessForStateChangingFunctions', '',
+        Justification = 'Set-EmailAddress is a pure factory that returns a new immutable value object. It does not modify system state; the input object is unchanged.'
+    )]
     [CmdletBinding()]
     [OutputType([EmailAddress])]
     param (

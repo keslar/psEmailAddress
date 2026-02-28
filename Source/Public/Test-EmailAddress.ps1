@@ -1,4 +1,4 @@
-<#
+﻿<#
     .SYNOPSIS
         Tests whether one or more strings are valid email address formats.
 

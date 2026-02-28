@@ -1,4 +1,4 @@
-<#
+﻿<#
     .SYNOPSIS
         Internal helper function to resolve a parameter that accepts either a string or an EmailAddress.
 
@@ -19,7 +19,7 @@
     .EXAMPLE
         Resolve-EmailAddressInput -InputValue "Chris Keslar <crk4@pitt.edu>" -ParameterName "ReferenceAddress"
         Returns an EmailAddress object representing the input string.
-        
+
 #>
 function Resolve-EmailAddressInput {
     [CmdletBinding()]

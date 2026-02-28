@@ -1,4 +1,4 @@
-<#
+﻿<#
     .SYNOPSIS
         Returns a new EmailAddress object with the address portion normalized to lowercase.
 

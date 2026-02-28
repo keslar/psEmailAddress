@@ -1,4 +1,4 @@
-<#
+﻿<#
     .SYNOPSIS
         Compares two email addresses for equality.
 

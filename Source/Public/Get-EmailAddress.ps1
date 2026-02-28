@@ -1,4 +1,4 @@
-<#
+﻿<#
     .SYNOPSIS
         Retrieves a specific property value from an EmailAddress object.
 
