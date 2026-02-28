@@ -553,5 +553,197 @@ Describe "EmailAddress Class Tests" {
                 [EmailAddress]::AreEqualIgnoringDisplayName($null, $null) | Should -Be $false
             }
         }
+
+        Context "4.10 Static Method Tests - GetValidationFailureReason" {
+
+            Context "4.10.1 Valid Addresses — Should return empty string" {
+                It "4.10.1.1 Should return empty string for a simple valid address" {
+                    [EmailAddress]::GetValidationFailureReason("crk4@pitt.edu") | Should -BeNullOrEmpty
+                }
+                It "4.10.1.2 Should return empty string for an address with a dot in the local part" {
+                    [EmailAddress]::GetValidationFailureReason("user.name@example.com") | Should -BeNullOrEmpty
+                }
+                It "4.10.1.3 Should return empty string for an address with a plus sign in the local part" {
+                    [EmailAddress]::GetValidationFailureReason("user+tag@example.com") | Should -BeNullOrEmpty
+                }
+                It "4.10.1.4 Should return empty string for an address with subdomains" {
+                    [EmailAddress]::GetValidationFailureReason("user@mail.sub.example.com") | Should -BeNullOrEmpty
+                }
+                It "4.10.1.5 Should return empty string for an address with a multi-part TLD" {
+                    [EmailAddress]::GetValidationFailureReason("user@example.co.uk") | Should -BeNullOrEmpty
+                }
+                It "4.10.1.6 Should return empty string for an address with uppercase characters" {
+                    [EmailAddress]::GetValidationFailureReason("USER@EXAMPLE.COM") | Should -BeNullOrEmpty
+                }
+                It "4.10.1.7 Should return empty string, not null, for a valid address" {
+                    # PowerShell coerces $null to '' on return from a [string]-typed method.
+                    # Callers must use IsNullOrEmpty rather than a $null check.
+                    $result = [EmailAddress]::GetValidationFailureReason("crk4@pitt.edu")
+                    $result | Should -BeOfType [string]
+                    $result | Should -BeNullOrEmpty
+                    ($null -eq $result) | Should -Be $false
+                }
+            }
+
+            Context "4.10.2 Null and Empty Input" {
+                It "4.10.2.1 Should return a reason for a null input" {
+                    [EmailAddress]::GetValidationFailureReason($null) |
+                        Should -Be 'Address must not be null or empty.'
+                }
+                It "4.10.2.2 Should return a reason for an empty string" {
+                    [EmailAddress]::GetValidationFailureReason("") |
+                        Should -Be 'Address must not be null or empty.'
+                }
+                It "4.10.2.3 Should return a reason for a whitespace-only string" {
+                    [EmailAddress]::GetValidationFailureReason("   ") |
+                        Should -Be 'Address must not be null or empty.'
+                }
+            }
+
+            Context "4.10.3 Total Length Violation" {
+                It "4.10.3.1 Should return a reason when the address exceeds 320 characters" {
+                    # Local part must be valid (<=64 chars); excess length comes from the domain.
+                    # 64 + 1 (@) + 256 = 321 characters total, triggering the 320-char limit.
+                    $localPart = "a" * 64
+                    $domain = ("b" * 63) + "." + ("c" * 63) + "." + ("d" * 63) + "." + ("e" * 63) + ".com"
+                    $address = "$localPart@$domain"
+                    $address.Length | Should -BeGreaterThan 320
+                    $result = [EmailAddress]::GetValidationFailureReason($address)
+                    $result | Should -BeLike "*320*"
+                }
+            }
+
+            Context "4.10.4 Missing or Multiple @ Symbol" {
+                It "4.10.4.1 Should return a reason when the @ symbol is missing" {
+                    [EmailAddress]::GetValidationFailureReason("notanemail") |
+                        Should -Be "Address must contain exactly one '@' symbol."
+                }
+                It "4.10.4.2 Should return a reason when the local part is missing (starts with @)" {
+                    [EmailAddress]::GetValidationFailureReason("@example.com") |
+                        Should -Be "Address must contain exactly one '@' symbol."
+                }
+                It "4.10.4.3 Should return a reason when multiple @ symbols are present" {
+                    [EmailAddress]::GetValidationFailureReason("a@b@example.com") |
+                        Should -Be "Address must contain exactly one '@' symbol."
+                }
+            }
+
+            Context "4.10.5 Local Part Length" {
+                It "4.10.5.1 Should return a reason when the local part exceeds 64 characters" {
+                    $localPart = "a" * 65
+                    $result = [EmailAddress]::GetValidationFailureReason("$localPart@example.com")
+                    $result | Should -BeLike "*Local part*"
+                    $result | Should -BeLike "*64*"
+                }
+                It "4.10.5.2 Should return empty string when the local part is exactly 64 characters" {
+                    $localPart = "a" * 64
+                    [EmailAddress]::GetValidationFailureReason("$localPart@example.com") |
+                        Should -BeNullOrEmpty
+                }
+            }
+
+            Context "4.10.6 Local Part Invalid Characters" {
+                It "4.10.6.1 Should return a reason when the local part contains a space" {
+                    $result = [EmailAddress]::GetValidationFailureReason("user name@example.com")
+                    $result | Should -BeLike "*Local part*invalid characters*"
+                }
+                It "4.10.6.2 Should return a reason when the local part contains a backslash" {
+                    $result = [EmailAddress]::GetValidationFailureReason("user\name@example.com")
+                    $result | Should -BeLike "*Local part*invalid characters*"
+                }
+            }
+
+            Context "4.10.7 Local Part Dot Rules" {
+                It "4.10.7.1 Should return a reason when the local part starts with a dot" {
+                    [EmailAddress]::GetValidationFailureReason(".user@example.com") |
+                        Should -Be "Local part '.user' must not start or end with a dot."
+                }
+                It "4.10.7.2 Should return a reason when the local part ends with a dot" {
+                    [EmailAddress]::GetValidationFailureReason("user.@example.com") |
+                        Should -Be "Local part 'user.' must not start or end with a dot."
+                }
+                It "4.10.7.3 Should return a reason when the local part contains consecutive dots" {
+                    [EmailAddress]::GetValidationFailureReason("us..er@example.com") |
+                        Should -Be "Local part 'us..er' must not contain consecutive dots."
+                }
+            }
+
+            Context "4.10.8 Domain Empty" {
+                It "4.10.8.1 Should return a reason when the domain is missing" {
+                    [EmailAddress]::GetValidationFailureReason("user@") |
+                        Should -Be 'Domain must not be empty.'
+                }
+            }
+
+            Context "4.10.9 Domain No TLD" {
+                It "4.10.9.1 Should return a reason when the domain has no dot (no TLD)" {
+                    $result = [EmailAddress]::GetValidationFailureReason("user@localdomain")
+                    $result | Should -BeLike "*top-level domain*"
+                }
+            }
+
+            Context "4.10.10 Domain Dot Rules" {
+                It "4.10.10.1 Should return a reason when the domain starts with a dot" {
+                    $result = [EmailAddress]::GetValidationFailureReason("user@.example.com")
+                    $result | Should -BeLike "*Domain*dot*"
+                }
+                It "4.10.10.2 Should return a reason when the domain ends with a dot" {
+                    $result = [EmailAddress]::GetValidationFailureReason("user@example.com.")
+                    $result | Should -BeLike "*Domain*dot*"
+                }
+            }
+
+            Context "4.10.11 Domain Hyphen Rules" {
+                It "4.10.11.1 Should return a reason when a domain label starts with a hyphen" {
+                    $result = [EmailAddress]::GetValidationFailureReason("user@-example.com")
+                    $result | Should -BeLike "*hyphen*"
+                }
+                It "4.10.11.2 Should return a reason when a domain label ends with a hyphen" {
+                    $result = [EmailAddress]::GetValidationFailureReason("user@example-.com")
+                    $result | Should -BeLike "*hyphen*"
+                }
+            }
+
+            Context "4.10.12 Domain Label Invalid Characters" {
+                It "4.10.12.1 Should return a reason when a domain label contains an underscore" {
+                    $result = [EmailAddress]::GetValidationFailureReason("user@ex_ample.com")
+                    $result | Should -BeLike "*Domain label*invalid characters*"
+                }
+            }
+
+            Context "4.10.13 TLD Length" {
+                It "4.10.13.1 Should return a reason when the TLD is only one character" {
+                    $result = [EmailAddress]::GetValidationFailureReason("user@example.c")
+                    $result | Should -BeLike "*Top-level domain*"
+                    $result | Should -BeLike "*2*"
+                }
+                It "4.10.13.2 Should return empty string when the TLD is exactly 2 characters" {
+                    [EmailAddress]::GetValidationFailureReason("user@example.co") |
+                        Should -BeNullOrEmpty
+                }
+            }
+
+            Context "4.10.14 Return Type" {
+                It "4.10.14.1 Should always return a string, never null, for any input" {
+                    $cases = @($null, "", "   ", "notvalid", "user@", "@domain.com", "crk4@pitt.edu")
+                    foreach ($case in $cases) {
+                        $result = [EmailAddress]::GetValidationFailureReason($case)
+                        $result | Should -BeOfType [string]
+                    }
+                }
+                It "4.10.14.2 IsValidEmailAddressFormat should agree with GetValidationFailureReason for valid input" {
+                    $isValid = [EmailAddress]::IsValidEmailAddressFormat("crk4@pitt.edu")
+                    $reason = [EmailAddress]::GetValidationFailureReason("crk4@pitt.edu")
+                    $isValid          | Should -Be $true
+                    $reason           | Should -BeNullOrEmpty
+                }
+                It "4.10.14.3 IsValidEmailAddressFormat should agree with GetValidationFailureReason for invalid input" {
+                    $isValid = [EmailAddress]::IsValidEmailAddressFormat("notvalid")
+                    $reason = [EmailAddress]::GetValidationFailureReason("notvalid")
+                    $isValid          | Should -Be $false
+                    $reason           | Should -Not -BeNullOrEmpty
+                }
+            }
+        }
     }
 }
