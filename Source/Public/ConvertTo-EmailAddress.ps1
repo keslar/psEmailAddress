@@ -97,10 +97,14 @@ function ConvertTo-EmailAddress {
             try {
                 [EmailAddress]::new($item)
             } catch {
-                Write-Error -Message "Cannot convert '$item' to EmailAddress: $($_.Exception.Message)" `
-                    -Category InvalidArgument `
-                    -TargetObject $item `
-                    -ErrorId 'InvalidEmailAddressString'
+                $errorRecord = [System.Management.Automation.ErrorRecord]::new(
+                    $_.Exception,
+                    'InvalidEmailAddressString',
+                    [System.Management.Automation.ErrorCategory]::InvalidArgument,
+                    $item
+                )
+
+                $PSCmdlet.WriteError($errorRecord)
             }
         }
     }
