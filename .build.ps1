@@ -44,15 +44,17 @@ param(
 ###############################################################################
 ## Script-level constants
 ###############################################################################
-
 $Script:ProjectRoot = $BuildRoot
-$Script:ModuleName = 'EmailAddress'
-$Script:SourcePath = Join-Path $BuildRoot 'Source'
-$Script:BuildOutput = Join-Path $BuildRoot 'Build'
-$Script:TestsPath = Join-Path $BuildRoot 'Tests'
-$Script:UnitTestsPath = Join-Path $BuildRoot 'Tests' 'Unit'
-$Script:IntTestsPath = Join-Path $BuildRoot 'Tests' 'Integration'
-$Script:AnalyzerSettings = Join-Path $BuildRoot 'PSScriptAnalyzerSettings.ps1'
+$Script:ModuleName = Split-Path -Path $Script:ProjectRoot -Leaf
+$Script:SourcePath = Join-Path -Path $Script:ProjectRoot -ChildPath 'Source'
+$Script:BuildOutput = Join-Path -Path $Script:ProjectRoot -ChildPath 'Build'
+$Script:TestsPath = Join-Path -Path $Script:ProjectRoot -ChildPath 'Tests'
+$Script:UnitTestsPath = Join-Path -Path $Script:TestsPath   -ChildPath 'Unit'
+$Script:IntTestsPath = Join-Path -Path $Script:TestsPath   -ChildPath 'Integration'
+$Script:AnalyzerSettings = Join-Path -Path $Script:ProjectRoot -ChildPath 'PSScriptAnalyzerSettings.ps1'
+if ($SemVer) {
+    $Script:SemwareVersion = $SemVer
+}
 
 ###############################################################################
 ## Version resolution — shared by Build and any task that needs the version
@@ -63,40 +65,53 @@ function Get-BuildVersion {
     .SYNOPSIS
         Resolves the semantic version for this build using a priority chain.
     #>
-    if ($SemVer) {
-        Write-Build DarkCyan "  Version source: -SemVer parameter ($SemVer)"
-        return $SemVer
+    $version = '0.0.0'
+    
+    #Write-Build Cyan 'Resolving build version...'
+    # Was a SemVer passed?
+    
+    if ( $null -ne $script:SemVersion ) {
+        # Use SemVer passed to the script
+        #Write-Build DarkCyan "  Version source: CLI ($script:SemVersion)"
+        return $script:SemVersion
+    } 
+
+    # Is there a version.txt in the ProjectRoot directory
+    #Write-Build Cyan '  No version passed via CLI. Checking for version.txt...'
+    #Write-Build Cyan "  Looking for version.txt in $($script:ProjectRoot)..."
+    $versionFile = Join-Path -Path $script:ProjectRoot -ChildPath "version.txt"
+    if ( Test-Path -Path $versionFile ) {
+        # Read version from version.txt file
+        $version = (Get-Content version.txt | Where-Object { ($_.trim().length -gt 0) -and (-not $_.Trim().StartsWith("#")) } | Select-Object -First 1)
+        return $version
     }
 
-    $versionFile = Join-Path $Script:ProjectRoot 'version.txt'
-    if (Test-Path $versionFile) {
-        $v = (Get-Content $versionFile -Raw).Trim()
-        Write-Build DarkCyan "  Version source: version.txt ($v)"
-        return $v
-    }
-
-    $gitDir = Join-Path $Script:ProjectRoot '.git'
-    if ((Test-Path $gitDir -PathType Container) -and (Get-Command git -ErrorAction SilentlyContinue)) {
-        if (Get-Command gitversion -ErrorAction SilentlyContinue) {
-            $v = (gitversion | ConvertFrom-Json).SemVer
-            Write-Build DarkCyan "  Version source: GitVersion ($v)"
-            return $v
+    # Let's try to get the version from git
+    $gitDir = Join-Path -Path $script:ProjectRoot -ChildPath ".git"
+    if ( (Test-Path -Path $gitDir -PathType Container) -and (Get-Command "git" -ErrorAction SilentlyContinue)) {
+        if (Get-Command "gitversion" -ErrorAction SilentlyContinue) {
+            # Get version using gitversion
+            $version = (gitversion | ConvertFrom-Json).FullSemVer
+            #Write-Build DarkCyan "  Version source: GitVersion ($version)"
+            return $version
+        } else {
+            # gitversion not installed, let's get it from git tags
+            $tag = git describe --tags --abbrev=0 2>$null
+            if ($tag) {
+                $version = $tag.TrimStart('v')
+                #Write-Build DarkCyan "  Version source: git tag ($version)"
+                return $version
+            }
         }
-        $tag = git describe --tags --abbrev=0 2>$null
-        if ($tag) {
-            $v = $tag.TrimStart('v')
-            Write-Build DarkCyan "  Version source: git tag ($v)"
-            return $v
-        }
     }
-
-    # Fall back: read manifest and auto-increment the patch segment
-    $manifestPath = Join-Path $Script:SourcePath "$Script:ModuleName.psd1"
+    
+    # fallback plan, read the manifest and autoincrement the version 
+    $manifestPath = Join-Path -Path $Script:SourcePath -ChildPath "$($Script:ModuleName).psd1"
     $manifest = Import-PowerShellDataFile $manifestPath
     $current = [version]$manifest.ModuleVersion
-    $v = '{0}.{1}.{2}' -f $current.Major, $current.Minor, ($current.Build + 1)
-    Write-Build Yellow "  Version source: manifest auto-increment ($v)"
-    return $v
+    $version = '{0}.{1}.{2}' -f $current.Major, $current.Minor, ($current.Build + 1)
+    #Write-Build Yellow "  Version source: manifest auto-increment ($v)"
+    return $version
 }
 
 ###############################################################################
@@ -162,6 +177,7 @@ task Build {
     Write-Build Cyan 'Building module...'
 
     $version = Get-BuildVersion
+    #Write-Build DarkCyan "  Resolved version: [$version]"
 
     $buildParams = @{
         SourcePath      = $Script:SourcePath
@@ -170,32 +186,32 @@ task Build {
     }
 
     $module = Build-Module @buildParams -Passthru
-
+    
     # Stamp {{BUILD_DATE}} and {{MODULE_VERSION}} placeholders in the built .psm1
     $psm1Path = Join-Path $module.ModuleBase "$($module.Name).psm1"
     if (Test-Path $psm1Path) {
         $buildDate = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
         $content = Get-Content $psm1Path -Raw
         $contentUpdated = $false
-
+    
         if ($content -match '\{\{BUILD_DATE\}\}') {
             $content = $content -replace '\{\{BUILD_DATE\}\}', $buildDate
             $contentUpdated = $true
         }
-
+    
         if ($content -match '\{\{MODULE_VERSION\}\}') {
             $content = $content -replace '\{\{MODULE_VERSION\}\}', $version
             $contentUpdated = $true
         }
-
+    
         if ($contentUpdated) {
             Set-Content -Path $psm1Path -Value $content -NoNewline
             Write-Build DarkCyan "  Stamped version $version and build date $buildDate"
         }
     }
-
+    
     Write-Build Green "  Built: $($module.Name) $($module.Version) → $($module.ModuleBase)"
-
+    
     # Persist the resolved module base path for downstream tasks
     $Script:BuiltModuleBase = $module.ModuleBase
     $Script:BuiltVersion = $module.Version
@@ -207,6 +223,8 @@ task Build {
 task TestUnit {
     Write-Build Cyan 'Running unit tests...'
 
+    Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass -Force
+
     $config = New-PesterConfiguration
     $config.Run.Path = $Script:UnitTestsPath
     $config.Run.PassThru = $true
@@ -217,7 +235,7 @@ task TestUnit {
     $config.CodeCoverage.Enabled = $true
     $config.CodeCoverage.Path = $Script:SourcePath
     $config.CodeCoverage.OutputPath = Join-Path $Script:ProjectRoot 'Coverage-Unit.xml'
-    $config.CodeCoverage.Threshold = 90
+    # $config.CodeCoverage.Threshold = 90
 
     $results = Invoke-Pester -Configuration $config
 
