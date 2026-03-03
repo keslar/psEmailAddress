@@ -121,7 +121,7 @@ parsing, validating, normalizing, formatting, and comparing RFC 5321/5322
 email addresses in PowerShell 5.1 and PowerShell 7+.'
 
             # Prerelease string of this module
-            # Prerelease = ''
+            Prerelease   = 'alpha'
 
             # Flag to indicate whether the module requires explicit user acceptance for install/update/save
             # RequireLicenseAcceptance = $false
