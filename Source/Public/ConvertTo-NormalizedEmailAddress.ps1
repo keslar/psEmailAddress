@@ -128,16 +128,16 @@ function ConvertTo-NormalizedEmailAddress {
             'FromEmailAddress' {
                 foreach ($item in $InputObject) {
                     try {
-                        [EmailAddress]::new($item)
+                        [EmailAddress]::NormalizeEmailAddressObject($item)
                     } catch {
-                        $errorRecord = [System.Management.Automation.ErrorRecord]::new(
-                            $_.Exception,
-                            'InvalidEmailAddressString',
-                            [System.Management.Automation.ErrorCategory]::InvalidArgument,
-                            $item
+                        $PSCmdlet.ThrowTerminatingError(
+                            [System.Management.Automation.ErrorRecord]::new(
+                                $_.Exception,
+                                'NormalizeEmailAddressFailed',
+                                [System.Management.Automation.ErrorCategory]::InvalidArgument,
+                                $item
+                            )
                         )
-
-                        $PSCmdlet.WriteError($errorRecord)
                     }
                 }
             }

@@ -88,7 +88,7 @@ function ConvertTo-EmailAddress {
             ValueFromPipeline = $true,
             HelpMessage = 'A plain address or named mailbox string to convert.'
         )]
-        [AllowEmptyString()]
+        #[AllowEmptyString()]
         [string[]]$InputObject
     )
 
@@ -97,14 +97,10 @@ function ConvertTo-EmailAddress {
             try {
                 [EmailAddress]::new($item)
             } catch {
-                $errorRecord = [System.Management.Automation.ErrorRecord]::new(
-                    $_.Exception,
-                    'InvalidEmailAddressString',
-                    [System.Management.Automation.ErrorCategory]::InvalidArgument,
-                    $item
-                )
-
-                $PSCmdlet.WriteError($errorRecord)
+                Write-Error -Message "Cannot convert '$item' to EmailAddress: $($_.Exception.Message)" `
+                    -Category InvalidArgument `
+                    -TargetObject $item `
+                    -ErrorId 'InvalidEmailAddressString'
             }
         }
     }
