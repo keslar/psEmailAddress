@@ -39,8 +39,8 @@ Describe "EmailAddress Class Tests" {
             $email.GetDisplayName() | Should -Be ""
         }
         It "1.7 Should accept a display name containing special characters" {
-            $email = [EmailAddress]::new("Keslar, Chris <crk4@pitt.edu>")
-            $email.GetDisplayName() | Should -Be "Keslar, Chris"
+            $email = [EmailAddress]::new("Keslar, [hris <crk4@pitt.edu>")
+            $email.GetDisplayName() | Should -Be "Keslar, [hris"
         }
         It "1.8 Should throw an error for an empty string" {
             { [EmailAddress]::new("") } | Should -Throw
