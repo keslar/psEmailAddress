@@ -52,13 +52,46 @@ $Script:TestsPath = Join-Path -Path $Script:ProjectRoot -ChildPath 'Tests'
 $Script:UnitTestsPath = Join-Path -Path $Script:TestsPath   -ChildPath 'Unit'
 $Script:IntTestsPath = Join-Path -Path $Script:TestsPath   -ChildPath 'Integration'
 $Script:AnalyzerSettings = Join-Path -Path $Script:ProjectRoot -ChildPath 'PSScriptAnalyzerSettings.ps1'
-if ($SemVer) {
-    $Script:SemwareVersion = $SemVer
+$Script:ConfigPath = Join-Path -Path $Script:ProjectRoot -ChildPath 'Config'
+
+
+###############################################################################
+## Local Configuration overides
+###############################################################################
+# Local Repository Connections or use PSGallery by default if no Config/LocalRepo.ps1 is found. This allows the build script to work out-of-the-box without any required configuration, while still supporting connection to the Pitt Teams module repository for devs who have access to it and want to use it for faster module installation during development.
+if ( Test-Path -Path (Join-Path -Path $Script:ProjectRoot -ChildPath 'LocalRepo.ps1') ) {
+    # Import repository connection setup functions from Config/LocalRepo.ps1
+    #todo: think through what functions this file should expose and whether it should be split into multiple files if it grows much larger. For now it just has functions for connecting to the Pitt Teams module repository, but we may want to add other repo-related functions in the future (e.g. for connecting to an internal Artifactory instance or something like that).
+    . "$Script:ConfigPath/LocalRepo.ps1"
+} else {
+    #todo: add repo functions for connecting to the PSGallery if we want/need them, but for now we'll just rely on the fact that PSGallery is the default repo and skip any setup if no Config directory is found. This will allow the build script to work out-of-the-box without any required configuration, while still supporting connection to the Pitt Teams module repository for devs who have access to it and want to use it for faster module installation during development. 
+    # Use PSGallery as the default repository if no Config directory is found
+    #Write-Build Yellow "No LocalRepo.ps1 in Config directory found at $($Script:ConfigPath). Using default repository connection settings (PSGallery)."
+    $Script:Repository = 'PSGallery'
 }
+
+# CodeSigning local override or use default settings if no Config/CodeSigning.ps1 is found. This allows the build script to work out-of-the-box without any required configuration, while still supporting connection to the Pitt Teams module repository for devs who have access to it and want to use it for faster module installation during development.
+if ( Test-Path -Path (Join-Path -Path $Script:ProjectRoot -ChildPath 'CodeSigning.ps1') ) {
+    # Import code signing setup functions from Config/CodeSigning.ps1
+    #todo: think through what functions this file should expose and whether it should be split into multiple files if it grows much larger. For now it just has functions for connecting to the Pitt Teams module repository, but we may want to add other repo-related functions in the future (e.g. for connecting to an internal Artifactory instance or something like that).
+    . "$Script:ConfigPath/CodeSigning.ps1"
+} else {
+    #todo: add repo functions for connecting to the PSGallery if we want/need them, but for now we'll just rely on the fact that PSGallery is the default repo and skip any setup if no Config directory is found. This will allow the build script to work out-of-the-box without any required configuration, while still supporting connection to the Pitt Teams module repository for devs who have access to it and want to use it for faster module installation during development. 
+    # Use PSGallery as the default repository if no Config directory is found
+    #Write-Build Yellow "No CodeSigning functions in the Config directory found at $($Script:ConfigPath). Using default code signing settings."
+    function Get-CodeSigningCertificate {
+        # Return null to indicate no code signing certificate is configured
+        return $null
+    }
+}
+
 
 ###############################################################################
 ## Version resolution — shared by Build and any task that needs the version
 ###############################################################################
+if ($SemVer) {
+    $Script:SemwareVersion = $SemVer
+}
 
 function Get-BuildVersion {
     <#
@@ -113,6 +146,7 @@ function Get-BuildVersion {
     #Write-Build Yellow "  Version source: manifest auto-increment ($v)"
     return $version
 }
+
 
 ###############################################################################
 ## Tasks
@@ -215,6 +249,15 @@ task Build {
     # Persist the resolved module base path for downstream tasks
     $Script:BuiltModuleBase = $module.ModuleBase
     $Script:BuiltVersion = $module.Version
+
+    # Sign the built module if a code signing certificate is configured
+    $cert = Get-CodeSigningCertificate
+    if ($cert) {
+        Sign-Module -ModulePath $module.ModuleBase -CertificateThumbprint $cert.Thumbprint
+        Write-Build Green "  Signed module with certificate: $($cert.Subject)"
+    } else {
+        Write-Build Yellow "  No code signing certificate configured. Skipping signing."
+    }   
 }
 
 #------------------------------------------------------------------------------
@@ -231,10 +274,12 @@ task TestUnit {
     $config.Output.Verbosity = 'Normal'
     $config.TestResult.Enabled = $true
     $config.TestResult.OutputFormat = 'JUnitXml'
-    $config.TestResult.OutputPath = Join-Path $Script:ProjectRoot 'TestResults-Unit.xml'
+    $config.TestResult.OutputPath = Join-Path $Script:TestsPath 'Results/TestResults-Unit.xml'
     $config.CodeCoverage.Enabled = $true
-    $config.CodeCoverage.Path = $Script:SourcePath
-    $config.CodeCoverage.OutputPath = Join-Path $Script:ProjectRoot 'Coverage-Unit.xml'
+    $config.CodeCoverage.Path = @(
+        "$($Script:SourcePath)/**/*.ps1"
+    )
+    $config.CodeCoverage.OutputPath = Join-Path $Script:TestsPath 'Results/Coverage-Unit.xml'
     # $config.CodeCoverage.Threshold = 90
 
     $results = Invoke-Pester -Configuration $config
@@ -308,8 +353,13 @@ task Publish Build, Test, {
         throw 'No Gallery API key. Pass -GalleryApiKey or set the PS_GALLERY_KEY environment variable.'
     }
 
-    Publish-Module -Path $Script:BuiltModuleBase -NuGetApiKey $GalleryApiKey
-    Write-Build Green "  Published $Script:ModuleName $Script:BuiltVersion to the PowerShell Gallery."
+    if ( $Script:Repository -eq 'PSGallery' ) {
+        Publish-Module -Path $Script:BuiltModuleBase -NuGetApiKey $GalleryApiKey
+        Write-Build Green "  Published $Script:ModuleName $Script:BuiltVersion to the PowerShell Gallery."
+    } else {
+        Write-Build Yellow "  Repository is set to $Script:Repository. Skipping publication to PowerShell Gallery."
+    }
+    
 }
 
 #------------------------------------------------------------------------------
