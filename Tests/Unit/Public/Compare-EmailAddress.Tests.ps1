@@ -12,11 +12,11 @@ BeforeAll {
     # Dot-source the EmailAddress class — required before the cmdlet can be loaded
     . $ProjectRoot/Source/Classes/EmailAddress.ps1
 
-    # Dot-source New-EmailAddress — used to build test fixtures
-    . $ProjectRoot/Source/Public/New-EmailAddress.ps1
-
     # Dot-source the helper function for resolving string inputs to EmailAddress objects
     . $ProjectRoot/Source/Private/Resolve-EmailAddressInput.ps1
+    
+    # Dot-source New-EmailAddress — used to build test fixtures
+    . $ProjectRoot/Source/Public/New-EmailAddress.ps1
 
     # Dot-source the cmdlet under test
     . $ProjectRoot/Source/Public/Compare-EmailAddress.ps1
