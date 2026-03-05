@@ -3,6 +3,7 @@ output/
 build/
 release/
 dist/
+Tests/Results/
 
 # Module manifest backup
 *.psd1.bak
