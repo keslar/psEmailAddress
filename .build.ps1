@@ -53,7 +53,8 @@ $Script:UnitTestsPath = Join-Path -Path $Script:TestsPath   -ChildPath 'Unit'
 $Script:IntTestsPath = Join-Path -Path $Script:TestsPath   -ChildPath 'Integration'
 $Script:AnalyzerSettings = Join-Path -Path $Script:ProjectRoot -ChildPath 'PSScriptAnalyzerSettings.ps1'
 $Script:ConfigPath = Join-Path -Path $Script:ProjectRoot -ChildPath 'Config'
-
+##
+$Script:AllowSelfSignedCerts = $false
 
 ###############################################################################
 ## Local Configuration overides
@@ -69,22 +70,6 @@ if ( Test-Path -Path (Join-Path -Path $Script:ProjectRoot -ChildPath 'LocalRepo.
     #Write-Build Yellow "No LocalRepo.ps1 in Config directory found at $($Script:ConfigPath). Using default repository connection settings (PSGallery)."
     $Script:Repository = 'PSGallery'
 }
-
-# CodeSigning local override or use default settings if no Config/CodeSigning.ps1 is found. This allows the build script to work out-of-the-box without any required configuration, while still supporting connection to the Pitt Teams module repository for devs who have access to it and want to use it for faster module installation during development.
-if ( Test-Path -Path (Join-Path -Path $Script:ProjectRoot -ChildPath 'CodeSigning.ps1') ) {
-    # Import code signing setup functions from Config/CodeSigning.ps1
-    #todo: think through what functions this file should expose and whether it should be split into multiple files if it grows much larger. For now it just has functions for connecting to the Pitt Teams module repository, but we may want to add other repo-related functions in the future (e.g. for connecting to an internal Artifactory instance or something like that).
-    . "$Script:ConfigPath/CodeSigning.ps1"
-} else {
-    #todo: add repo functions for connecting to the PSGallery if we want/need them, but for now we'll just rely on the fact that PSGallery is the default repo and skip any setup if no Config directory is found. This will allow the build script to work out-of-the-box without any required configuration, while still supporting connection to the Pitt Teams module repository for devs who have access to it and want to use it for faster module installation during development. 
-    # Use PSGallery as the default repository if no Config directory is found
-    #Write-Build Yellow "No CodeSigning functions in the Config directory found at $($Script:ConfigPath). Using default code signing settings."
-    function Get-CodeSigningCertificate {
-        # Return null to indicate no code signing certificate is configured
-        return $null
-    }
-}
-
 
 ###############################################################################
 ## Version resolution — shared by Build and any task that needs the version
@@ -153,7 +138,7 @@ function Get-BuildVersion {
 ###############################################################################
 
 # Default task — run when Invoke-Build is called with no task name
-task . Analyze, Build, TestUnit
+task . Analyze, Build, Sign, TestUnit
 
 #------------------------------------------------------------------------------
 # Clean — remove all build output
@@ -182,7 +167,8 @@ task Analyze {
         ErrorAction = 'SilentlyContinue'
     }
 
-    $findings = Invoke-ScriptAnalyzer @analyzeParams
+    $findings = Invoke-ScriptAnalyzer @analyzeParams  | Where-Object { $_.Severity -ne 'Information' }
+
 
     if ($findings) {
         $errors = @($findings | Where-Object Severity -EQ 'Error')
@@ -203,7 +189,53 @@ task Analyze {
         Write-Build Green '  No issues found.'
     }
 }
+#------------------------------------------------------------------------------
+# SignedBuild — build the module and sign the output with a code signing certificate
+#------------------------------------------------------------------------------
+task Sign Build, {
+    Write-Build Cyan 'Signing built module...'
 
+    if (Test-Path -Path (Join-Path $Script:ConfigPath -ChildPath "Get-CodeSigningCertificate.ps1")) {
+        #Write-Build Green "Importing code signing certificate retrieval function from $($Script:ConfigPath)/Get-CodeSigningCertificate.ps1)"
+        . (Join-Path $Script:ConfigPath -ChildPath "Get-CodeSigningCertificate.ps1")
+    } else {
+        function Get-CodeSigningCertificate {
+            param (
+                [switch]$AllowSelfSigned
+            )
+            $codeSigningCerts = Get-ChildItem -Path Cert:\CurrentUser\My -CodeSigningCert | Where-Object { $_.NotAfter -gt (Get-Date) }
+            if ( $AllowSelfSigned ) {
+                return $codeSigningCerts | Select-Object -First 1
+            } else {
+                return $codeSigningCerts | Where-Object { -not $_.Verify() } | Select-Object -First 1
+            }
+        }
+    }
+
+    if (-not $Script:BuiltModuleBase) {
+        throw 'BuiltModuleBase is not set. Run the Build task first.'
+    }
+
+    $timestampServer = "http://timestamp.digicert.com"
+
+    if ($Script:AllowSelfSignedCerts) {
+        $cert = Get-CodeSigningCertificate -AllowSelfSigned
+    } else {
+        $cert = Get-CodeSigningCertificate
+    }
+    
+    if ($cert) {
+        foreach ( $moduleFile in (Get-ChildItem -Path $Script:BuiltModuleBase -Include *.psd1, *.psm1 -Recurse) ) {
+            #Write-Build Green "  Signing: $($moduleFile.FullName) with certificate: $($cert.Subject)"
+            $results = Set-AuthenticodeSignature -FilePath $moduleFile.FullName -Certificate $cert -TimestampServer $timestampServer -HashAlgorithm SHA256
+            #Write-Build Green "  Signed module with certificate: $($cert.Subject)"    
+        }
+        
+    } else {
+        Write-Build Yellow "  No code signing certificate configured. Skipping signing."
+    }
+
+}
 #------------------------------------------------------------------------------
 # Build — compile source into a single .psm1 via ModuleBuilder
 #------------------------------------------------------------------------------
@@ -248,16 +280,7 @@ task Build {
     
     # Persist the resolved module base path for downstream tasks
     $Script:BuiltModuleBase = $module.ModuleBase
-    $Script:BuiltVersion = $module.Version
-
-    # Sign the built module if a code signing certificate is configured
-    $cert = Get-CodeSigningCertificate
-    if ($cert) {
-        Sign-Module -ModulePath $module.ModuleBase -CertificateThumbprint $cert.Thumbprint
-        Write-Build Green "  Signed module with certificate: $($cert.Subject)"
-    } else {
-        Write-Build Yellow "  No code signing certificate configured. Skipping signing."
-    }   
+    $Script:BuiltVersion = $module.Version   
 }
 
 #------------------------------------------------------------------------------
@@ -300,7 +323,7 @@ task TestUnit {
 #------------------------------------------------------------------------------
 # TestIntegration — run integration tests against the *built* module output
 #------------------------------------------------------------------------------
-task TestIntegration Build, {
+task TestIntegration Sign, Build, {
     Write-Build Cyan 'Running integration tests...'
 
     if (-not $Script:BuiltModuleBase) {
@@ -362,7 +385,7 @@ task Publish Build, Test, {
     
 }
 
-#------------------------------------------------------------------------------
+#------------------------------------------------------------------------------cd 
 # Release — full pipeline: clean, analyze, build, test, publish
 #------------------------------------------------------------------------------
-task Release Clean, Analyze, Build, Test, Publish
+task Release Clean, Analyze, Build, Sign, Test, Publish
