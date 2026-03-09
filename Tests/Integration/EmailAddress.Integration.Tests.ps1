@@ -13,7 +13,7 @@ BeforeAll {
         $script:ModuleBase = $env:EMAILADDRESS_BUILT_MODULE
     } else {
         # Find the highest version directory under Build/EmailAddress/
-        $buildRoot = Join-Path $ProjectRoot 'Build' 'EmailAddress'
+        $buildRoot = Join-Path $ProjectRoot 'Output' 'EmailAddress'
         $latestBuild = Get-ChildItem -Path $buildRoot -Directory |
             Sort-Object { [version]$_.Name } |
             Select-Object -Last 1
