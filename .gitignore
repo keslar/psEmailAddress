@@ -3,7 +3,6 @@ output/
 build/
 release/
 dist/
-Tests/Results/
 
 # Module manifest backup
 *.psd1.bak
@@ -11,6 +10,8 @@ Tests/Results/
 # Test Results
 testResults/
 TestResults/
+Tests/Results/
+TestResults-Integration.xml
 coverage.xml
 Coverage-Unit.xml
 TestResults.xml

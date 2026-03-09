@@ -9,6 +9,9 @@
         'PSAvoidUsingDeprecatedManifestFields', 
         'PSPossibleIncorrectUsageOfAssignmentOperator', 
         'PSUseShouldProcessForStateChangingFunctions',
-        'PSUseOutputTypeCorrectly'
+        'PSUseOutputTypeCorrectly',
+        'PSUseSingularNouns',
+        'TypeNotFound'
+
     )
 }
