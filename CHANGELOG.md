@@ -1,3 +1,5 @@
+## 1.0.0
+
 # CHANGELOG
 
 All notable changes to this project will be documented in this file.
