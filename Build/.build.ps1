@@ -58,7 +58,8 @@ Import-Module ModuleBuilder -ErrorAction Stop
 ###############################################################################
 $Script:ProjectRoot = Split-Path -Path $PSScriptRoot -Parent
 $Script:SourcePath = Join-Path  -Path $Script:ProjectRoot -ChildPath 'Source'
-$Script:ModuleName = Split-Path -Path $Script:ProjectRoot -Leaf
+$Script:ModuleName = 'EmailAddress'
+#$Script:ModuleName = Split-Path -Path $Script:ProjectRoot -Leaf
 #$Script:ModuleName = (Get-ChildItem -Path $Script:SourcePath -Filter '*.psd1' |
 #        Select-Object -First 1).BaseName
 $Script:ManifestPath = Join-Path  -Path $Script:SourcePath  -ChildPath "$($Script:ModuleName).psd1"
