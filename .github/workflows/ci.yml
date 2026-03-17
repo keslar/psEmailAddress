@@ -48,7 +48,7 @@ jobs:
             - name: Run PSScriptAnalyzer
               run: |
                   $ErrorActionPreference = 'Stop'
-                  Invoke-Build Analyze -File ./build/.build.ps1
+                  Invoke-Build Analyze -File ./Build/.build.ps1
 
             # -------------------------------------------------------------------
             # 4. Build
@@ -56,7 +56,7 @@ jobs:
             - name: Build module
               run: |
                   $ErrorActionPreference = 'Stop'
-                  Invoke-Build Build -File ./build/.build.ps1
+                  Invoke-Build Build -File ./Build/.build.ps1
 
             # -------------------------------------------------------------------
             # 5. Unit tests
@@ -64,7 +64,7 @@ jobs:
             - name: Run unit tests
               run: |
                   $ErrorActionPreference = 'Stop'
-                  Invoke-Build TestUnit -File ./build/.build.ps1
+                  Invoke-Build TestUnit -File ./Build/.build.ps1
 
             - name: Upload unit test results
               if: always()
@@ -88,7 +88,7 @@ jobs:
             - name: Run integration tests
               run: |
                   $ErrorActionPreference = 'Stop'
-                  Invoke-Build TestIntegration -File ./build/.build.ps1
+                  Invoke-Build TestIntegration -File ./Build/.build.ps1
 
             - name: Upload integration test results
               if: always()
@@ -148,7 +148,7 @@ jobs:
             - name: Run PSScriptAnalyzer
               run: |
                   $ErrorActionPreference = 'Stop'
-                  Invoke-Build Analyze -File ./build/.build.ps1
+                  Invoke-Build Analyze -File ./Build/.build.ps1
 
             # -------------------------------------------------------------------
             # 5. Build
@@ -156,7 +156,7 @@ jobs:
             - name: Build module
               run: |
                   $ErrorActionPreference = 'Stop'
-                  Invoke-Build Build -File ./build/.build.ps1
+                  Invoke-Build Build -File ./Build/.build.ps1
 
             # -------------------------------------------------------------------
             # 6. Unit tests
@@ -164,7 +164,7 @@ jobs:
             - name: Run unit tests
               run: |
                   $ErrorActionPreference = 'Stop'
-                  Invoke-Build TestUnit -File ./build/.build.ps1
+                  Invoke-Build TestUnit -File ./Build/.build.ps1
 
             - name: Upload unit test results
               if: always()
@@ -188,7 +188,7 @@ jobs:
             - name: Run integration tests
               run: |
                   $ErrorActionPreference = 'Stop'
-                  Invoke-Build TestIntegration -File ./build/.build.ps1
+                  Invoke-Build TestIntegration -File ./Build/.build.ps1
 
             - name: Upload integration test results
               if: always()

@@ -3,13 +3,13 @@
     Path                     = "./EmailAddress.psd1"
 
     # Where to output the built module
-    OutputDirectory          = "./build"
+    OutputDirectory          = "./Output"
 
     # Version management
     VersionedOutputDirectory = $true          # Creates output/MyModule/1.2.0/
 
     # Semver — overrides what's in the manifest
-    # ModuleVersion = "1.2.0"
+    ModuleVersion            = '1.0.1'
 
     # Prefix/Suffix content added to top/bottom of the merged .psm1
     Prefix                   = "prefix.ps1"                     # File path or inline string
@@ -29,7 +29,7 @@
 
     # Copy additional files into the output (not merged into .psm1)
     CopyPaths                = @(
-        'en-US'          # Localization
+        '../Docs/help/en-US'          # Localization
         '../Data'           # Data files
         # 'lib/some.dll'
     )
