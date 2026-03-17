@@ -50,6 +50,7 @@ jobs:
             - name: Bootstrap PowerShellGet
               run: |
                   $ErrorActionPreference = 'Stop'
+                  Import-Module PowerShellGet -Force
                   Install-Module -Name PowerShellGet -RequiredVersion 2.0.4 `
                       -Force -Scope CurrentUser -AllowClobber -SkipPublisherCheck
 
