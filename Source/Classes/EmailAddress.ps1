@@ -349,7 +349,7 @@ class EmailAddress {
         # Must contain exactly one @ symbol
         $atIndex = $address.IndexOf('@')
         if ($atIndex -le 0 -or $atIndex -ne $address.LastIndexOf('@')) {
-            return "Address must contain exactly one '@' symbol."
+            return "Address must contain exactly one `@ symbol."
         }
 
         $localPart = $address.Substring(0, $atIndex)

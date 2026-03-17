@@ -162,7 +162,7 @@ if ($PushTag) { $ibParams['PushTag'] = $true }
 # Execute
 ###############################################################################
 Write-Host ''
-Write-Host "Tasks : $($tasksToRun -join ' → ')" -ForegroundColor Cyan
+Write-Host "Tasks : $($tasksToRun -join ' -> ')" -ForegroundColor Cyan
 if ($SemVer) { Write-Host "SemVer      : $SemVer"      -ForegroundColor DarkCyan }
 if ($VersionBump) { Write-Host "VersionBump : $VersionBump" -ForegroundColor DarkCyan }
 if ($PushTag) { Write-Host "PushTag     : true"         -ForegroundColor DarkCyan }
