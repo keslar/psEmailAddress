@@ -6,7 +6,7 @@ BeforeAll {
     # Dot-source the necessary files for testing
     #################################################################################
     # Dot-source the EmailAddress class file to make it available for testing
-    . $ProjectRoot/source/Classes/EmailAddress.ps1
+    . $ProjectRoot/Source/Classes/EmailAddress.ps1
 }
 
 Describe "EmailAddress Class Tests" {
