@@ -6,7 +6,7 @@ BeforeAll {
     # Dot-source the necessary files for testing
     #################################################################################
     # Dot-source the EmailAddress class file to make it available for testing
-    . $ProjectRoot/source/Classes//EmailAddress.ps1
+    . $ProjectRoot/source/Classes/EmailAddress.ps1
 }
 
 Describe "EmailAddress Class Tests" {
@@ -613,16 +613,16 @@ Describe "EmailAddress Class Tests" {
                 }
             }
 
-            Context "4.10.4 Missing or Multiple @ Symbol" {
-                It "4.10.4.1 Should return a reason when the @ symbol is missing" {
+            Context "4.10.4 Missing or Multiple `@ Symbol" {
+                It "4.10.4.1 Should return a reason when the `@ symbol is missing" {
                     [EmailAddress]::GetValidationFailureReason("notanemail") |
                         Should -Be "Address must contain exactly one '@' symbol."
                 }
-                It "4.10.4.2 Should return a reason when the local part is missing (starts with @)" {
+                It "4.10.4.2 Should return a reason when the local part is missing (starts with `@)" {
                     [EmailAddress]::GetValidationFailureReason("@example.com") |
                         Should -Be "Address must contain exactly one '@' symbol."
                 }
-                It "4.10.4.3 Should return a reason when multiple @ symbols are present" {
+                It "4.10.4.3 Should return a reason when multiple `@ symbols are present" {
                     [EmailAddress]::GetValidationFailureReason("a@b@example.com") |
                         Should -Be "Address must contain exactly one '@' symbol."
                 }
