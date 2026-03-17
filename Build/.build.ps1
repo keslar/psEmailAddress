@@ -280,6 +280,11 @@ task Build TestUnit, {
 task Sign Build, {
     Write-Build Cyan 'Signing built module...'
 
+    # Skip signing if not running on Windows locally, since Set-AuthenticodeSignature is Windows-only and code signing is typically only needed for local development and PSGallery publishing (which requires a Windows-signed package).
+    if (-not $IsWindows -or $env:CI) {
+        Write-Build Yellow '  Skipping signing (not running on Windows or running in CI environment).'
+        return
+    }
     # Select the most recently expiring valid code signing certificate
     $cert = Get-ChildItem -Path Cert:\CurrentUser\My -CodeSigningCert |
         Where-Object { $_.NotAfter -gt (Get-Date) } |
