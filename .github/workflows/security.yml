@@ -50,6 +50,9 @@ jobs:
   static-analysis:
     name: PSScriptAnalyzer (security rules)
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write # required for upload-sarif
+      contents: read
     defaults:
       run:
         shell: pwsh
@@ -113,7 +116,7 @@ jobs:
 
       - name: Upload SARIF to GitHub Security tab
         if: always()
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         with:
           sarif_file: pssa-results.sarif
           category: PSScriptAnalyzer
