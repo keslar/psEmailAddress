@@ -6,15 +6,15 @@
         Returns a formatted string representation of one or more EmailAddress objects.
         Three formats are available via the -Format parameter:
 
-          Address  — plain address only: "crk4@pitt.edu"
+          Address  - plain address only: "crk4@pitt.edu"
                      Equivalent to EmailAddress.ToString().
                      This is the default.
 
-          Friendly — display name and address if a display name is present, otherwise
+          Friendly - display name and address if a display name is present, otherwise
                      plain address: "Chris Keslar <crk4@pitt.edu>" or "crk4@pitt.edu"
                      Equivalent to EmailAddress.GetFriendlyName().
 
-          RFC5322  — RFC 5322-compliant format. The display name is quoted if it
+          RFC5322  - RFC 5322-compliant format. The display name is quoted if it
                      contains special characters or whitespace; embedded double quotes
                      in the display name are escaped:
                        "Chris Keslar" <crk4@pitt.edu>      (space requires quoting)
@@ -88,7 +88,7 @@
           - RFC5322  includes the display name, quoting it if required by the standard.
 
         When no display name is set on the EmailAddress object, all three formats
-        produce identical output — the plain address string.
+        produce identical output - the plain address string.
     #>
 function Format-EmailAddress {
     [CmdletBinding()]

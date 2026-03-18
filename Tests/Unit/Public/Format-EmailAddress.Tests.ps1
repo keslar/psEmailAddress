@@ -1,4 +1,7 @@
+if ((Get-Module Pester).Version.Major -lt 5) { Write-Warning "This test file requires Pester v5 or later. Skipping."; return }
+
 BeforeAll {
+     # Ensure we're running from the project root where the module can be found
     # Find the project root by going up three levels from the current script directory
     # Tests\Unit\Public\ -> Tests\Unit\ -> Tests\ -> ProjectRoot\
     $ProjectRoot = (Resolve-Path -Literal (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..")).Path
@@ -9,10 +12,10 @@ BeforeAll {
     # Dot-source the prefix file to set up the environment and variables
     . $ProjectRoot/Source/prefix.ps1
 
-    # Dot-source the EmailAddress class — required before the cmdlet can be loaded
+    # Dot-source the EmailAddress class - required before the cmdlet can be loaded
     . $ProjectRoot/Source/Classes/EmailAddress.ps1
 
-    # Dot-source New-EmailAddress — used to create test fixtures
+    # Dot-source New-EmailAddress - used to create test fixtures
     . $ProjectRoot/Source/Public/New-EmailAddress.ps1
 
     # Dot-source the cmdlet under test
@@ -21,16 +24,16 @@ BeforeAll {
     #################################################################################
     # Shared test fixtures
     #################################################################################
-    # Plain address — no display name
+    # Plain address - no display name
     $script:plain = New-EmailAddress -Address "crk4@pitt.edu"
 
-    # Named mailbox — display name with only letters and a space (space requires quoting in RFC5322)
+    # Named mailbox - display name with only letters and a space (space requires quoting in RFC5322)
     $script:named = New-EmailAddress -Address "Chris Keslar <crk4@pitt.edu>"
 
-    # Named mailbox — display name containing a comma (requires quoting in RFC5322)
+    # Named mailbox - display name containing a comma (requires quoting in RFC5322)
     $script:comma = New-EmailAddress -Address "Keslar, Chris <crk4@pitt.edu>"
 
-    # Named mailbox — display name with no special characters or whitespace (no quoting needed)
+    # Named mailbox - display name with no special characters or whitespace (no quoting needed)
     $script:nospace = New-EmailAddress -Address "ChrisKeslar <crk4@pitt.edu>"
 }
 
@@ -86,7 +89,7 @@ Describe "Format-EmailAddress Cmdlet Tests" {
                 Format-EmailAddress -InputObject $script:comma -Format Friendly | Should -Be "Keslar, Chris <crk4@pitt.edu>"
             }
             It "2.2.3 Should not quote the display name regardless of its content" {
-                # Friendly format is unquoted — quoting is only applied in RFC5322 format
+                # Friendly format is unquoted - quoting is only applied in RFC5322 format
                 $result = Format-EmailAddress -InputObject $script:comma -Format Friendly
                 $result | Should -Not -BeLike '"*"*'
             }

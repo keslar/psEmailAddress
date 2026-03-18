@@ -1,3 +1,5 @@
+if ((Get-Module Pester).Version.Major -lt 5) { Write-Warning "This test file requires Pester v5 or later. Skipping."; return }
+
 BeforeAll {
     # Find the project root by going up three levels from the current script directory
     # Tests\Unit\Private\ -> Tests\Unit\ -> Tests\ -> ProjectRoot\
@@ -9,7 +11,7 @@ BeforeAll {
     # Dot-source the prefix file to set up the environment and variables
     . $ProjectRoot/Source/prefix.ps1
 
-    # Dot-source the EmailAddress class — required before the function can be loaded
+    # Dot-source the EmailAddress class - required before the function can be loaded
     . $ProjectRoot/Source/Classes/EmailAddress.ps1
 
     # Dot-source the private function under test
@@ -24,11 +26,10 @@ BeforeAll {
 }
 
 Describe "Resolve-EmailAddressInput Private Function Tests" {
-
     Context "1 EmailAddress Object Input" {
         It "1.1 Should return the same EmailAddress object when given an EmailAddress" {
             $result = Resolve-EmailAddressInput -InputValue $script:plainEmail -ParameterName "ReferenceAddress"
-            ($result -is [EmailAddress]) | Should -Be $true
+            ($result.GetType().Name -eq "EmailAddress") | Should -Be $true
         }
         It "1.2 Should return the identical object reference when given an EmailAddress" {
             $result = Resolve-EmailAddressInput -InputValue $script:plainEmail -ParameterName "ReferenceAddress"

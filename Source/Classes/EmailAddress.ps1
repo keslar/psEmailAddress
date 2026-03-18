@@ -50,7 +50,7 @@ class EmailAddress {
     # Constructors
     #------------------------------------------------------------------
 
-    # Disabled default constructor — an email address is meaningless without a value.
+    # Disabled default constructor - an email address is meaningless without a value.
     EmailAddress() {
         throw "Default constructor is not allowed. Use the parameterized constructor or a static factory method."
     }
@@ -85,7 +85,7 @@ class EmailAddress {
             $this._DisplayName = $matches[1].Trim()
             $this._Address = $matches[2].Trim()
         } else {
-            # Plain address — no display name
+            # Plain address - no display name
             $this._DisplayName = ''
             $this._Address = $Address.Trim()
         }
@@ -97,7 +97,7 @@ class EmailAddress {
     }
 
     #------------------------------------------------------------------
-    # Instance Methods — Accessors
+    # Instance Methods - Accessors
     #------------------------------------------------------------------
 
     <#
@@ -143,7 +143,7 @@ class EmailAddress {
     }
 
     #------------------------------------------------------------------
-    # Instance Methods — Formatting
+    # Instance Methods - Formatting
     #------------------------------------------------------------------
 
     <#
@@ -159,7 +159,7 @@ class EmailAddress {
         }
     }
 
-    # Aliases for GetFriendlyName — provided for naming-convention flexibility.
+    # Aliases for GetFriendlyName - provided for naming-convention flexibility.
     # All three delegate to GetFriendlyName and produce identical output.
     [string] FriendlyName() { return $this.GetFriendlyName() }
     [string] NamedMailbox() { return $this.GetFriendlyName() }
@@ -201,11 +201,11 @@ class EmailAddress {
         [string] RFC 5322-formatted address string.
 
     .EXAMPLE
-        # No special characters — no quoting needed
+        # No special characters - no quoting needed
         "Chris Keslar <crk4@pitt.edu>"
 
     .EXAMPLE
-        # Display name contains a comma — quoting applied
+        # Display name contains a comma - quoting applied
         '"Keslar, Chris" <crk4@pitt.edu>'
     #>
     [string] ToRFC5322String() {
@@ -226,7 +226,7 @@ class EmailAddress {
     }
 
     #------------------------------------------------------------------
-    # Instance Methods — Comparison
+    # Instance Methods - Comparison
     #------------------------------------------------------------------
 
     <#
@@ -288,7 +288,7 @@ class EmailAddress {
     }
 
     #------------------------------------------------------------------
-    # Static Methods — Validation
+    # Static Methods - Validation
     #------------------------------------------------------------------
 
     <#
@@ -515,7 +515,7 @@ class EmailAddress {
     }
 
     #------------------------------------------------------------------
-    # Static Methods — Factory / Parsing
+    # Static Methods - Factory / Parsing
     #------------------------------------------------------------------
 
     <#
@@ -677,7 +677,7 @@ class EmailAddress {
     }
 
     #------------------------------------------------------------------
-    # Static Methods — Normalization and Comparison
+    # Static Methods - Normalization and Comparison
     #------------------------------------------------------------------
 
     <#
@@ -760,7 +760,7 @@ class EmailAddress {
 #----------------------------------------------------------------------
 # Read-only script properties
 # Registered via Update-TypeData so they appear as natural properties
-# (e.g. $email.Address) while remaining immutable — the setter throws.
+# (e.g. $email.Address) while remaining immutable - the setter throws.
 #----------------------------------------------------------------------
 
 Update-TypeData -TypeName EmailAddress `

@@ -1,3 +1,5 @@
+if ((Get-Module Pester).Version.Major -lt 5) { Write-Warning "This test file requires Pester v5 or later. Skipping."; return }
+
 BeforeAll {
     # Find the project root by going up three levels from the current script directory
     # Tests\Unit\Public\ -> Tests\Unit\ -> Tests\ -> ProjectRoot\
@@ -9,10 +11,10 @@ BeforeAll {
     # Dot-source the prefix file to set up the environment and variables
     . $ProjectRoot/Source/prefix.ps1
 
-    # Dot-source the EmailAddress class — required before the cmdlet can be loaded
+    # Dot-source the EmailAddress class - required before the cmdlet can be loaded
     . $ProjectRoot/Source/Classes/EmailAddress.ps1
 
-    # Dot-source New-EmailAddress — used to build test fixtures
+    # Dot-source New-EmailAddress - used to build test fixtures
     . $ProjectRoot/Source/Public/New-EmailAddress.ps1
 
     # Dot-source the cmdlet under test
@@ -21,7 +23,7 @@ BeforeAll {
     #################################################################################
     # Shared test fixtures
     #################################################################################
-    # Plain address — no display name
+    # Plain address - no display name
     $script:plain = New-EmailAddress -Address "crk4@pitt.edu"
 
     # Named mailbox
@@ -210,7 +212,7 @@ Describe "Set-EmailAddress Cmdlet Tests" {
         }
     }
 
-    Context "5 Immutability — Original Object Is Never Modified" {
+    Context "5 Immutability - Original Object Is Never Modified" {
         It "5.1 Should not modify the original address when -Address is used" {
             $original = $script:plain.GetAddress()
             Set-EmailAddress -InputObject $script:plain -Address "jdoe@example.com" | Out-Null

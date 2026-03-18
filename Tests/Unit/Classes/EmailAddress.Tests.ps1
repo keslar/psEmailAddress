@@ -1,3 +1,5 @@
+if ((Get-Module Pester).Version.Major -lt 5) { Write-Warning "This test file requires Pester v5 or later. Skipping."; return }
+
 BeforeAll {
     # Find the project root by going up three levels from the current script directory
     $ProjectRoot = (Resolve-Path -Literal (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..")).Path
@@ -10,10 +12,9 @@ BeforeAll {
 }
 
 Describe "EmailAddress Class Tests" {
-
     Context "1 Constructor Tests" {
         It "1.1 Should throw an error if the default constructor is used" {
-            { [EmailAddress]::new() } | Should -Throw "*Default constructor is not allowed*"
+            { [EmailAddress]::new() } | Should -Throw 'Default constructor is not allowed. Use the parameterized constructor or a static factory method.'
         }
         It "1.2 Should create an EmailAddress object from a plain address" {
             $email = [EmailAddress]::new("crk4@pitt.edu")
@@ -80,10 +81,10 @@ Describe "EmailAddress Class Tests" {
                 $script:propTestEmail.DisplayName | Should -Be "Chris Keslar"
             }
             It "2.1.3 Should throw when trying to set Address" {
-                { $script:propTestEmail.Address = "other@example.com" } | Should -Throw '*Exception setting "Address"*'
+                { $script:propTestEmail.Address = "other@example.com" } | Should -Throw 'Exception setting "Address": "Address is a read-only property."'
             }
             It "2.1.4 Should throw when trying to set DisplayName" {
-                { $script:propTestEmail.DisplayName = "Someone Else" } | Should -Throw '*Exception setting "DisplayName"*'
+                { $script:propTestEmail.DisplayName = "Someone Else" } | Should -Throw 'Exception setting "DisplayName": "DisplayName is a read-only property."'
             }
             It "2.1.5 Should return Address as a string type" {
                 $script:propTestEmail.Address | Should -BeOfType [string]
@@ -387,7 +388,7 @@ Describe "EmailAddress Class Tests" {
                 $email.GetDisplayName() | Should -Be "Chris Keslar"
             }
             It "4.3.3 Should throw for an invalid address" {
-                { [EmailAddress]::FromString("bad-address") } | Should -Throw "*bad-address*"
+                { [EmailAddress]::FromString("bad-address") } | Should -Throw "Failed to create EmailAddress from input 'bad-address': Invalid email address format: 'bad-address'"
             }
             It "4.3.4 FromString and GetEmailAddressFromString should produce equivalent objects" {
                 $a = [EmailAddress]::FromString("crk4@pitt.edu")
@@ -556,7 +557,7 @@ Describe "EmailAddress Class Tests" {
 
         Context "4.10 Static Method Tests - GetValidationFailureReason" {
 
-            Context "4.10.1 Valid Addresses — Should return empty string" {
+            Context "4.10.1 Valid Addresses - Should return empty string" {
                 It "4.10.1.1 Should return empty string for a simple valid address" {
                     [EmailAddress]::GetValidationFailureReason("crk4@pitt.edu") | Should -BeNullOrEmpty
                 }
@@ -616,15 +617,15 @@ Describe "EmailAddress Class Tests" {
             Context "4.10.4 Missing or Multiple `@ Symbol" {
                 It "4.10.4.1 Should return a reason when the `@ symbol is missing" {
                     [EmailAddress]::GetValidationFailureReason("notanemail") |
-                        Should -Be "Address must contain exactly one @ symbol."
+                        Should -Be "Address must contain exactly one `@ symbol."
                 }
                 It "4.10.4.2 Should return a reason when the local part is missing (starts with `@)" {
                     [EmailAddress]::GetValidationFailureReason("@example.com") |
-                        Should -Be "Address must contain exactly one @ symbol."
+                        Should -Be "Address must contain exactly one `@ symbol."
                 }
                 It "4.10.4.3 Should return a reason when multiple `@ symbols are present" {
                     [EmailAddress]::GetValidationFailureReason("a@b@example.com") |
-                        Should -Be "Address must contain exactly one @ symbol."
+                        Should -Be "Address must contain exactly one `@ symbol."
                 }
             }
 

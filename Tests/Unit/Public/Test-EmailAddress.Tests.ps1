@@ -1,4 +1,7 @@
+if ((Get-Module Pester).Version.Major -lt 5) { Write-Warning "This test file requires Pester v5 or later. Skipping."; return }
+
 BeforeAll {
+    # Ensure we're running from the project root where the module can be found
     # Find the project root by going up three levels from the current script directory
     # Tests\Unit\Public\ -> Tests\Unit\ -> Tests\ -> ProjectRoot\
     $ProjectRoot = (Resolve-Path -Literal (Join-Path -Path $PSScriptRoot -ChildPath "..\..\..")).Path
@@ -9,22 +12,18 @@ BeforeAll {
     # Dot-source the prefix file to set up the environment and variables
     . $ProjectRoot/Source/prefix.ps1
 
-    # Dot-source the EmailAddress class — required before the cmdlet can be loaded
+    # Dot-source the EmailAddress class - required before the cmdlet can be loaded
     . $ProjectRoot/Source/Classes/EmailAddress.ps1
 
-    # Dot-source New-EmailAddress — used in Context 4 to supply EmailAddress objects
+    # Dot-source New-EmailAddress - used in Context 4 to supply EmailAddress objects
     . $ProjectRoot/Source/Public/New-EmailAddress.ps1
 
     # Dot-source the cmdlet under test
     . $ProjectRoot/Source/Public/Test-EmailAddress.ps1
-
-
 }
 
 Describe "Test-EmailAddress Cmdlet Tests" {
-
     Context "1 Default Output - Valid Addresses" {
-
         Context "1.1 Plain Address Strings" {
             It "1.1.1 Should return true for a simple valid address" {
                 Test-EmailAddress -InputObject "crk4@pitt.edu" | Should -Be $true
@@ -49,7 +48,6 @@ Describe "Test-EmailAddress Cmdlet Tests" {
                 Test-EmailAddress -InputObject "$localPart@example.com" | Should -Be $true
             }
         }
-
         Context "1.2 Named Mailbox Strings" {
             It "1.2.1 Should return true for a named mailbox string with a valid address" {
                 Test-EmailAddress -InputObject "Chris Keslar <crk4@pitt.edu>" | Should -Be $true

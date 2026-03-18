@@ -37,7 +37,7 @@ string is reported as a non-terminating error and skipped, allowing the
 remaining inputs to be processed.
 
 This makes ConvertTo-EmailAddress suitable for bulk or batch conversions
-where some inputs may be malformed — for example, importing a list of
+where some inputs may be malformed - for example, importing a list of
 addresses from a CSV and discarding the bad ones.
 
 Input may be supplied directly via -InputObject or piped in.
@@ -90,7 +90,7 @@ $badAddresses for inspection without interrupting the pipeline.
 
 $addresses = "crk4@pitt.edu", "jdoe@example.com", "notvalid"
 $valid = $addresses | ConvertTo-EmailAddress -ErrorAction SilentlyContinue
-$valid.Count   # 2 — only the valid ones
+$valid.Count   # 2 - only the valid ones
 
 Suppresses error output and collects only the successfully converted objects.
 
@@ -150,10 +150,10 @@ skipped and reported via Write-Error.
 
 The key difference between ConvertTo-EmailAddress and New-EmailAddress:
 
-  New-EmailAddress      — single-object creation; invalid input is a
+  New-EmailAddress      - single-object creation; invalid input is a
                           terminating error that stops the pipeline.
 
-  ConvertTo-EmailAddress — bulk conversion; invalid input is a
+  ConvertTo-EmailAddress - bulk conversion; invalid input is a
                            non-terminating error that skips the item
                            and continues.
 

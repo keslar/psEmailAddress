@@ -6,12 +6,12 @@
 
 Start here before opening an issue:
 
-- **`Get-Help`** — all cmdlets ship with full help content. Use
+- **`Get-Help`** - all cmdlets ship with full help content. Use
   `Get-Help <cmdlet-name> -Full` for parameter details and examples, or
   `Get-Help about_EmailAddress` for a conceptual overview of the module.
-- **README** — covers installation, all eight cmdlets, and common pipeline
+- **README** - covers installation, all eight cmdlets, and common pipeline
   patterns: [README.md](../README.md)
-- **Project site** — [github.com/keslar/psEmailAddress](https://github.com/keslar/psEmailAddress)
+- **Project site** - [github.com/keslar/psEmailAddress](https://github.com/keslar/psEmailAddress)
 
 ### GitHub Discussions
 
@@ -27,7 +27,7 @@ Before opening one:
 - Check the [existing issues](https://github.com/keslar/psEmailAddress/issues)
   (open and closed) to see if it has already been reported
 - Make sure you can reproduce the problem on the latest published version
-- Use the provided issue templates — they ask for the information needed to
+- Use the provided issue templates - they ask for the information needed to
   investigate quickly
 
 If you are unsure whether something is a bug or a usage question, ask in
@@ -43,9 +43,9 @@ See [SECURITY.md](SECURITY.md) for the private reporting process.
 This module is maintained by a single developer alongside other responsibilities.
 Response times are best-effort:
 
-- **Issues and Discussions** — typically within a few business days, though this
+- **Issues and Discussions** - typically within a few business days, though this
   is not guaranteed
-- **Pull requests** — reviewed when time allows; see
+- **Pull requests** - reviewed when time allows; see
   [CONTRIBUTING.md](CONTRIBUTING.md) for guidance on what makes a PR easy to
   review and merge
 

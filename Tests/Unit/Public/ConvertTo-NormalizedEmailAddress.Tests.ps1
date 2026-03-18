@@ -1,3 +1,5 @@
+if ((Get-Module Pester).Version.Major -lt 5) { Write-Warning "This test file requires Pester v5 or later. Skipping."; return }
+
 BeforeAll {
     # Find the project root by going up three levels from the current script directory
     # Tests\Unit\Public\ -> Tests\Unit\ -> Tests\ -> ProjectRoot\
@@ -9,13 +11,13 @@ BeforeAll {
     # Dot-source the prefix file to set up the environment and variables
     . $ProjectRoot/Source/prefix.ps1
 
-    # Dot-source the EmailAddress class — required before the cmdlet can be loaded
+    # Dot-source the EmailAddress class - required before the cmdlet can be loaded
     . $ProjectRoot/Source/Classes/EmailAddress.ps1
 
     # Dot-source Resolve-EmailAddressInput.ps1 
     . $ProjectRoot/Source/Private/Resolve-EmailAddressInput.ps1
 
-    # Dot-source New-EmailAddress — used to build test fixtures and for comparison tests
+    # Dot-source New-EmailAddress - used to build test fixtures and for comparison tests
     . $ProjectRoot/Source/Public/New-EmailAddress.ps1
 
     # Dot-source the cmdlet under test
@@ -24,13 +26,13 @@ BeforeAll {
     #################################################################################
     # Shared test fixtures
     #################################################################################
-    # Uppercase plain address — needs normalization
+    # Uppercase plain address - needs normalization
     $script:upper = New-EmailAddress -Address "CRK4@PITT.EDU"
 
-    # Already-lowercase plain address — normalization is a no-op
+    # Already-lowercase plain address - normalization is a no-op
     $script:lower = New-EmailAddress -Address "crk4@pitt.edu"
 
-    # Mixed-case named mailbox — address needs normalization, display name must be preserved
+    # Mixed-case named mailbox - address needs normalization, display name must be preserved
     $script:namedUpper = New-EmailAddress -Address "Chris Keslar <CRK4@PITT.EDU>"
 
     # Already-normalized named mailbox
@@ -38,9 +40,7 @@ BeforeAll {
 }
 
 Describe "ConvertTo-NormalizedEmailAddress Cmdlet Tests" {
-
     Context "1 Parameter Set - FromEmailAddress" {
-
         Context "1.1 Address Normalization" {
             It "1.1.1 Should return an EmailAddress object" {
                 $result = ConvertTo-NormalizedEmailAddress -InputObject $script:upper

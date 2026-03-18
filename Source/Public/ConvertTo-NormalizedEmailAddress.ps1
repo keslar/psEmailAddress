@@ -12,16 +12,16 @@
 
         Two input modes are supported:
 
-          -InputObject  — accepts one or more [EmailAddress] objects directly or
+          -InputObject  - accepts one or more [EmailAddress] objects directly or
                           via the pipeline.
 
-          -Address      — accepts one or more plain address or named mailbox strings.
+          -Address      - accepts one or more plain address or named mailbox strings.
                           Each string is first converted to an EmailAddress object,
                           then normalized. Invalid strings are reported as non-terminating
                           errors and skipped, consistent with ConvertTo-EmailAddress.
 
         This cmdlet is useful for ensuring consistency before comparison, deduplication,
-        storage, or display — for example, normalizing a batch of addresses imported
+        storage, or display - for example, normalizing a batch of addresses imported
         from a case-inconsistent source before inserting them into a database.
 
     .PARAMETER InputObject
@@ -144,7 +144,7 @@ function ConvertTo-NormalizedEmailAddress {
 
             'FromString' {
                 foreach ($item in $Address) {
-                    # Construct first — this validates the string and parses any display name.
+                    # Construct first - this validates the string and parses any display name.
                     # Use non-terminating Write-Error on failure so the pipeline continues,
                     # consistent with ConvertTo-EmailAddress behaviour.
                     $emailObj = $null

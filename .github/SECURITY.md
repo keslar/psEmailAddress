@@ -7,9 +7,9 @@ Older versions are not patched. If a vulnerability is found, the fix will be rel
 as a new version and the advisory will note the first safe version to use.
 
 | Version | Supported |
-|---------|-----------|
-| Latest  | ✅ Yes    |
-| Older   | ❌ No     |
+| ------- | --------- |
+| Latest  | ✅ Yes     |
+| Older   | ❌ No      |
 
 ## Scope
 
@@ -37,14 +37,14 @@ believe this module is using a dependency in an insecure way, that is in scope.
 
 Use one of the following private channels:
 
-- **GitHub private vulnerability reporting** — the preferred method. From the
+- **GitHub private vulnerability reporting** - the preferred method. From the
   repository's Security tab, click **"Report a vulnerability"** to open a private
   draft advisory. GitHub will notify the maintainer and keep the report confidential
   until a fix is available.
 
-- **Email** — if you are unable to use GitHub's private reporting feature, send a
+- **Email** - if you are unable to use GitHub's private reporting feature, send a
   report to [crk4@pitt.edu](mailto:crk4@pitt.edu) with the subject line:
-  `[SECURITY] psEmailAddress — <brief description>`.
+  `[SECURITY] psEmailAddress - <brief description>`.
 
 ## What to Include in Your Report
 
@@ -55,14 +55,14 @@ Please include:
 - The affected version(s)
 - Step-by-step instructions to reproduce the issue
 - A minimal code example or test case that demonstrates the problem
-- Any relevant context — operating system, PowerShell edition (5.1 / 7.x), locale
+- Any relevant context - operating system, PowerShell edition (5.1 / 7.x), locale
 
 ## What to Expect
 
 - **Acknowledgement** within 5 business days of receipt
 - **Initial assessment** (confirmed, not confirmed, or needs more information)
   within 10 business days
-- **Fix and coordinated disclosure** as soon as a patch is ready — typically within
+- **Fix and coordinated disclosure** as soon as a patch is ready - typically within
   30 days for confirmed issues, depending on complexity
 
 You will be kept informed throughout the process. Once a fix is released, a GitHub
@@ -81,7 +81,7 @@ you are welcome to disclose publicly.
 The following are not considered security vulnerabilities for this project:
 
 - Validation rule disagreements (e.g. "this address should be valid/invalid per RFC X")
-  — please open a regular issue instead
+  - please open a regular issue instead
 - Vulnerabilities in PowerShell itself or the .NET runtime
 - Issues that require a malicious actor to already have arbitrary code execution on
   the target machine

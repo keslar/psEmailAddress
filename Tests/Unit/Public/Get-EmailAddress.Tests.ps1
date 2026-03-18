@@ -1,3 +1,5 @@
+if ((Get-Module Pester).Version.Major -lt 5) { Write-Warning "This test file requires Pester v5 or later. Skipping."; return }
+
 BeforeAll {
     # Find the project root by going up three levels from the current script directory
     # Tests\Unit\Public\ -> Tests\Unit\ -> Tests\ -> ProjectRoot\
@@ -9,31 +11,31 @@ BeforeAll {
     # Dot-source the prefix file to set up the environment and variables
     . $ProjectRoot/Source/prefix.ps1
 
-    # Dot-source the EmailAddress class — required before the cmdlet can be loaded
+    # Dot-source the EmailAddress class - required before the cmdlet can be loaded
     . $ProjectRoot/Source/Classes/EmailAddress.ps1
 
-    # Dot-source New-EmailAddress — used to build test fixtures
+    # Dot-source New-EmailAddress - used to build test fixtures
     . $ProjectRoot/Source/Public/New-EmailAddress.ps1
 
     # Dot-source the cmdlet under test
     . $ProjectRoot/Source/Public/Get-EmailAddress.ps1
 
-    # Dot-source Format-EmailAddress — used in Context 10 for cross-cmdlet consistency tests
+    # Dot-source Format-EmailAddress - used in Context 10 for cross-cmdlet consistency tests
     . $ProjectRoot/Source/Public/Format-EmailAddress.ps1
 
     #################################################################################
     # Shared test fixtures
     #################################################################################
-    # Plain address — no display name
+    # Plain address - no display name
     $script:plain = New-EmailAddress -Address "crk4@pitt.edu"
 
-    # Named mailbox — space in display name (requires RFC5322 quoting)
+    # Named mailbox - space in display name (requires RFC5322 quoting)
     $script:named = New-EmailAddress -Address "Chris Keslar <crk4@pitt.edu>"
 
-    # Named mailbox — comma in display name (also requires RFC5322 quoting)
+    # Named mailbox - comma in display name (also requires RFC5322 quoting)
     $script:comma = New-EmailAddress -Address "Keslar, Chris <crk4@pitt.edu>"
 
-    # Named mailbox — no special characters (no RFC5322 quoting needed)
+    # Named mailbox - no special characters (no RFC5322 quoting needed)
     $script:nospace = New-EmailAddress -Address "ChrisKeslar <crk4@pitt.edu>"
 
     # Address with a subdomain

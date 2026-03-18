@@ -27,7 +27,7 @@ function New-GitTag {
     param([string]$Version)
     $tag = "v$Version"
 
-    # Stage only tracked files — respects .gitignore
+    # Stage only tracked files - respects .gitignore
     git add -u
 
     # Only commit if there are staged changes

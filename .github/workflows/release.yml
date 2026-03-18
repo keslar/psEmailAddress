@@ -15,7 +15,7 @@ jobs:
 
     steps:
       # -----------------------------------------------------------------------
-      # 1. Checkout — full history so git describe works if needed
+      # 1. Checkout - full history so git describe works if needed
       # -----------------------------------------------------------------------
       - name: Checkout repository
         uses: actions/checkout@v4

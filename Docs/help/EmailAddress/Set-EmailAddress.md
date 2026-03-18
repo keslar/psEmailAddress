@@ -57,17 +57,17 @@ original.
 Exactly one of the following mutually exclusive parameters must be supplied
 to specify which component to replace:
 
-  -Address      — replaces the entire address portion (local-part@domain).
+  -Address      - replaces the entire address portion (local-part@domain).
                   The display name from the original is preserved.
 
-  -DisplayName  — replaces the display name only.
+  -DisplayName  - replaces the display name only.
                   The address portion from the original is preserved.
                   Supplying an empty string removes the display name.
 
-  -LocalPart    — replaces the local part of the address (before the @).
+  -LocalPart    - replaces the local part of the address (before the @).
                   The domain and display name from the original are preserved.
 
-  -Domain       — replaces the domain portion of the address (after the @).
+  -Domain       - replaces the domain portion of the address (after the @).
                   The local part and display name from the original are preserved.
 
 Accepts pipeline input on -InputObject.

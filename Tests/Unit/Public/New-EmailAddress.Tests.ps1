@@ -1,3 +1,5 @@
+if ((Get-Module Pester).Version.Major -lt 5) { Write-Warning "This test file requires Pester v5 or later. Skipping."; return }
+
 BeforeAll {
     # Find the project root by going up four levels from the current script directory
     # Tests\Unit\Public\ -> Tests\Unit\ -> Tests\ -> ProjectRoot\
@@ -9,7 +11,7 @@ BeforeAll {
     # Dot-source the prefix file to set up the environment and variables
     . $ProjectRoot/Source/prefix.ps1
 
-    # Dot-source the EmailAddress class — required before the cmdlet can be loaded
+    # Dot-source the EmailAddress class - required before the cmdlet can be loaded
     . $ProjectRoot/Source/Classes/EmailAddress.ps1
 
     # Dot-source the cmdlet under test
@@ -17,9 +19,7 @@ BeforeAll {
 }
 
 Describe "New-EmailAddress Cmdlet Tests" {
-
     Context "1 Parameter Set - FromString" {
-
         Context "1.1 Valid Input" {
             It "1.1.1 Should return an EmailAddress object from a plain address" {
                 $result = New-EmailAddress -Address "crk4@pitt.edu"

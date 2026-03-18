@@ -8,12 +8,12 @@
     # Version management
     VersionedOutputDirectory = $true          # Creates output/MyModule/1.2.0/
 
-    # Semver — overrides what's in the manifest
+    # Semver - overrides what's in the manifest
     ModuleVersion            = '1.0.1'
 
     # Prefix/Suffix content added to top/bottom of the merged .psm1
     Prefix                   = "prefix.ps1"                     # File path or inline string
-    # Suffix = "suffix.ps1"
+    Suffix                   = "suffix.ps1"
 
     # Control which directories get merged into the .psm1
     # By default, Public/ and Private/ folders are included

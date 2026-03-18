@@ -120,7 +120,7 @@ if (-not (Test-Path $buildFile)) {
 $tasksToRun = [System.Collections.Generic.List[string]]::new()
 
 if ($Task -and $Task.Count -gt 0) {
-    # Explicit task list — pass through directly, ignore all switches
+    # Explicit task list - pass through directly, ignore all switches
     $Task | ForEach-Object { $tasksToRun.Add($_) }
 
 } elseif ($Release) {

@@ -17,8 +17,8 @@ LONG DESCRIPTION
 
     [EmailAddress] objects are immutable. All fields are set at construction
     time and exposed only through read-only properties and getter methods.
-    No setters exist. Cmdlets that appear to modify an address — such as
-    Set-EmailAddress — always return a new [EmailAddress] instance. The
+    No setters exist. Cmdlets that appear to modify an address - such as
+    Set-EmailAddress - always return a new [EmailAddress] instance. The
     original object is never changed.
 
     This means you can safely pass [EmailAddress] objects to functions,
@@ -145,7 +145,7 @@ COMMON PIPELINE PATTERNS
             Test-EmailAddress -Detailed |
             Where-Object { -not $_.IsValid } |
             ForEach-Object {
-                Write-Warning "Invalid: $($_.Input) — $($_.Reason)"
+                Write-Warning "Invalid: $($_.Input) - $($_.Reason)"
             }
 
   Import a CSV, skip bad addresses, normalize, and format for an API
@@ -165,7 +165,7 @@ COMMON PIPELINE PATTERNS
         $valid   = $results | Where-Object { $_.IsValid }
         $invalid = $results | Where-Object { -not $_.IsValid }
 
-  Bulk domain migration — replace domain for every address in a list
+  Bulk domain migration - replace domain for every address in a list
 
         Import-Csv .\accounts.csv |
             Select-Object -ExpandProperty Email |
@@ -213,8 +213,8 @@ CMDLET SUMMARY
         (with display name), or RFC5322 (with quoting applied).
 
     Get-EmailAddress
-        Extracts a single named property — Address, DisplayName, LocalPart,
-        Domain, Friendly, or RFC5322 — as a string.
+        Extracts a single named property - Address, DisplayName, LocalPart,
+        Domain, Friendly, or RFC5322 - as a string.
 
     Set-EmailAddress
         Returns a new [EmailAddress] with one component replaced: -Address,

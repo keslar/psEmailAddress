@@ -38,11 +38,11 @@
     - Commit messages should follow Conventional Commits for automatic
       version bumping (feat:, fix:, BREAKING CHANGE)
 #>
-# param() MUST be first in the file — Invoke-Build passes these as named
+# param() MUST be first in the file - Invoke-Build passes these as named
 # parameters when calling the build file, same as any other script.
 param(
     [string]$SemVer,
-    [string]$VersionBump,   # major | minor | patch — validated in Version task
+    [string]$VersionBump,   # major | minor | patch - validated in Version task
     [switch]$PushTag
 )
 
@@ -97,14 +97,14 @@ if (Test-Path $helpersPath) {
 ###############################################################################
 
 #------------------------------------------------------------------------------
-# Default task — runs when no specific task is provided
+# Default task - runs when no specific task is provided
 #------------------------------------------------------------------------------
 task . Clean, Version, Build, Sign, TestIntegration, {
     Write-Build Green "Build complete! Version $($Script:ResolvedVersion) is ready."
 }
 
 #------------------------------------------------------------------------------
-# Clean — remove all build output
+# Clean - remove all build output
 #------------------------------------------------------------------------------
 task Clean {
     Write-Build Cyan 'Cleaning previous build outputs...'
@@ -118,7 +118,7 @@ task Clean {
 }
 
 #------------------------------------------------------------------------------
-# Analyze — static code analysis via PSScriptAnalyzer
+# Analyze - static code analysis via PSScriptAnalyzer
 #------------------------------------------------------------------------------
 task Analyze {
     Write-Build Cyan 'Running PSScriptAnalyzer...'
@@ -153,44 +153,57 @@ task Analyze {
 }
 
 #------------------------------------------------------------------------------
-# TestUnit — run Pester unit tests with code coverage
+# TestUnit - run Pester unit tests with code coverage
 #------------------------------------------------------------------------------
 task TestUnit Analyze, {
     Write-Build Cyan 'Running Pester unit tests...'
 
-    $pesterConfig = New-PesterConfiguration
-    # Run Settings
-    $pesterConfig.Run.Path = Join-Path -Path $Script:TestsPath -ChildPath 'Unit'
-    $pesterConfig.Run.PassThru = $true
-    # Output Settings
-    $pesterConfig.Output.Verbosity = 'Normal'
-    # Test Result Settings
-    $pesterConfig.TestResult.Enabled = $true
-    $pesterConfig.TestResult.OutputFormat = 'JUnitXml'
-    $pesterConfig.TestResult.OutputPath = Join-Path -Path $Script:TestsPath -ChildPath 'Results/TestResults-Unit.xml'
-    # Code Coverage Settings
-    $pesterConfig.CodeCoverage.Enabled = $true
-    $pesterConfig.CodeCoverage.Path = @("$($Script:SourcePath)/**/*.ps1")
-    $pesterConfig.CodeCoverage.OutputPath = Join-Path -Path $Script:TestsPath -ChildPath 'Results/Coverage-Unit.xml'
-    $pesterConfig.CodeCoverage.CoveragePercentTarget = $Script:CoverageThreshold
+    # Capture variables before crossing the process boundary
+    $testsPath = $Script:TestsPath
+    $sourcePath = $Script:SourcePath
+    $threshold = $Script:CoverageThreshold
 
-    $results = Invoke-Pester -Configuration $pesterConfig
+    pwsh -NoProfile -NonInteractive -Command {
+        param($TestsPath, $SourcePath, $CoverageThreshold)
 
-    Write-Build White "  Passed: $($results.PassedCount)   Failed: $($results.FailedCount)   Skipped: $($results.SkippedCount)"
+        Import-Module Pester -MinimumVersion 5.0 -ErrorAction Stop
 
-    if ($results.FailedCount -gt 0) {
-        throw "Unit tests: $($results.FailedCount) test(s) failed."
+        $pesterConfig = New-PesterConfiguration
+        $pesterConfig.Run.Path = Join-Path $TestsPath 'Unit'
+        $pesterConfig.Run.PassThru = $true
+        $pesterConfig.Output.Verbosity = 'Normal'
+        $pesterConfig.TestResult.Enabled = $true
+        $pesterConfig.TestResult.OutputFormat = 'JUnitXml'
+        $pesterConfig.TestResult.OutputPath = Join-Path $TestsPath 'Results/TestResults-Unit.xml'
+        $pesterConfig.CodeCoverage.Enabled = $true
+        $pesterConfig.CodeCoverage.Path = @("$SourcePath/**/*.ps1")
+        $pesterConfig.CodeCoverage.OutputPath = Join-Path $TestsPath 'Results/Coverage-Unit.xml'
+        $pesterConfig.CodeCoverage.CoveragePercentTarget = $CoverageThreshold
+
+        $results = Invoke-Pester -Configuration $pesterConfig
+
+        Write-Host "  Passed: $($results.PassedCount)   Failed: $($results.FailedCount)   Skipped: $($results.SkippedCount)"
+
+        if ($results.FailedCount -gt 0) {
+            throw "Unit tests: $($results.FailedCount) test(s) failed."
+        }
+
+        $coverage = [math]::Round($results.CodeCoverage.CoveragePercent, 1)
+        if ($coverage -lt $CoverageThreshold) {
+            throw "Code coverage $coverage% is below the $CoverageThreshold% threshold."
+        }
+
+        Write-Host "  All unit tests passed. Coverage: $coverage%"
+
+    } -args $testsPath, $sourcePath, $threshold
+
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Unit test task failed — see output above.'
     }
-
-    if ($results.CodeCoverage.CoveragePercent -lt $Script:CoverageThreshold) {
-        throw "Code coverage $([math]::Round($results.CodeCoverage.CoveragePercent, 1))% is below the $($Script:CoverageThreshold)% threshold."
-    }
-
-    Write-Build Green "  All unit tests passed. Coverage: $([math]::Round($results.CodeCoverage.CoveragePercent, 1))%"
 }
 
 #------------------------------------------------------------------------------
-# Version — determine and set the next module version
+# Version - determine and set the next module version
 #------------------------------------------------------------------------------
 task Version {
     Write-Build Cyan 'Determining next version...'
@@ -231,7 +244,7 @@ task Version {
 }
 
 #------------------------------------------------------------------------------
-# Build — compile source into a single .psm1 via ModuleBuilder
+# Build - compile source into a single .psm1 via ModuleBuilder
 #------------------------------------------------------------------------------
 task Build TestUnit, {
     Write-Build Cyan 'Building module...'
@@ -275,7 +288,7 @@ task Build TestUnit, {
 }
 
 #------------------------------------------------------------------------------
-# Sign — digitally sign the built .psm1 and .psd1
+# Sign - digitally sign the built .psm1 and .psd1
 #------------------------------------------------------------------------------
 task Sign Build, {
     Write-Build Cyan 'Signing built module...'
@@ -297,14 +310,14 @@ task Sign Build, {
 
     # Detect whether this is a self-signed certificate:
     # A self-signed cert has the same Subject and Issuer, and its chain
-    # cannot be verified against a trusted root — so Set-AuthenticodeSignature
+    # cannot be verified against a trusted root - so Set-AuthenticodeSignature
     # will return UnknownError instead of Valid. We allow that status for
     # self-signed certs but still catch real failures (HashMismatch, NotSigned, etc.)
     $isSelfSigned = $cert.Subject -eq $cert.Issuer
     $validStatuses = if ($isSelfSigned) { @('Valid', 'UnknownError') } else { @('Valid') }
 
     if ($isSelfSigned) {
-        Write-Build Yellow '  Self-signed certificate detected — UnknownError status will be accepted.'
+        Write-Build Yellow '  Self-signed certificate detected - UnknownError status will be accepted.'
     }
 
     Write-Build DarkCyan "  Certificate  : $($cert.Subject)"
@@ -312,7 +325,7 @@ task Sign Build, {
     Write-Build DarkCyan "  Expires      : $($cert.NotAfter.ToString('yyyy-MM-dd'))"
     Write-Build DarkCyan "  Self-Signed  : $isSelfSigned"
 
-    # Only use a timestamp server for CA-issued certs — self-signed certs
+    # Only use a timestamp server for CA-issued certs - self-signed certs
     # will cause the timestamp request to fail or be ignored anyway.
     $signParams = @{
         Certificate = $cert
@@ -344,51 +357,64 @@ task Sign Build, {
 }
 
 #------------------------------------------------------------------------------
-# TestIntegration — run Pester integration tests against the built/signed module
+# TestIntegration - run Pester integration tests against the built/signed module
 #------------------------------------------------------------------------------
 task TestIntegration Sign, {
     Write-Build Cyan 'Running Pester integration tests...'
 
     $integrationPath = Join-Path -Path $Script:TestsPath -ChildPath 'Integration'
-    if (-not (Test-Path $integrationPath) -or 
+    if (-not (Test-Path $integrationPath) -or
         -not (Get-ChildItem -Path $integrationPath -Filter '*.Tests.ps1' -Recurse)) {
         Write-Build Yellow '  No integration tests found, skipping.'
         return
     }
-    
-    # Ensure we are testing the built/signed output, not the source
-    if (Get-Module -Name $Script:ModuleName) {
-        Remove-Module -Name $Script:ModuleName -Force
-    }
+
+    # Capture variables before crossing the process boundary
+    $testsPath = $Script:TestsPath
+    $moduleName = $Script:ModuleName
     $psd1Path = Join-Path $Script:BuiltModuleBase "$($Script:ModuleName).psd1"
-    Import-Module $psd1Path -Force
 
-    $pesterConfig = New-PesterConfiguration
-    # Run Settings
-    $pesterConfig.Run.Path = Join-Path -Path $Script:TestsPath -ChildPath 'Integration'
-    $pesterConfig.Run.PassThru = $true
-    # Output Settings
-    $pesterConfig.Output.Verbosity = 'Normal'
-    # Test Result Settings
-    $pesterConfig.TestResult.Enabled = $true
-    $pesterConfig.TestResult.OutputFormat = 'JUnitXml'
-    $pesterConfig.TestResult.OutputPath = Join-Path -Path $Script:TestsPath -ChildPath 'Results/TestResults-Integration.xml'
+    pwsh -NoProfile -NonInteractive -Command {
+        param($TestsPath, $ModuleName, $Psd1Path)
 
-    $results = Invoke-Pester -Configuration $pesterConfig
+        Import-Module Pester -MinimumVersion 5.0 -ErrorAction Stop
 
-    Write-Build White "  Passed: $($results.PassedCount)   Failed: $($results.FailedCount)   Skipped: $($results.SkippedCount)"
+        # Ensure we are testing the built/signed output, not the source
+        if (Get-Module -Name $ModuleName) {
+            Remove-Module -Name $ModuleName -Force
+        }
+        Import-Module $Psd1Path -Force
 
-    if ($results.FailedCount -gt 0) {
-        throw "Integration tests: $($results.FailedCount) test(s) failed."
+        $pesterConfig = New-PesterConfiguration
+        # Run Settings
+        $pesterConfig.Run.Path = Join-Path $TestsPath 'Integration'
+        $pesterConfig.Run.PassThru = $true
+        # Output Settings
+        $pesterConfig.Output.Verbosity = 'Normal'
+        # Test Result Settings
+        $pesterConfig.TestResult.Enabled = $true
+        $pesterConfig.TestResult.OutputFormat = 'JUnitXml'
+        $pesterConfig.TestResult.OutputPath = Join-Path $TestsPath 'Results/TestResults-Integration.xml'
+
+        $results = Invoke-Pester -Configuration $pesterConfig
+
+        Write-Host "  Passed: $($results.PassedCount)   Failed: $($results.FailedCount)   Skipped: $($results.SkippedCount)"
+
+        if ($results.FailedCount -gt 0) {
+            throw "Integration tests: $($results.FailedCount) test(s) failed."
+        }
+
+        Write-Host '  All integration tests passed.'
+        exit 0
+    } -args $testsPath, $moduleName, $psd1Path
+
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Integration test task failed — see output above.'
     }
-
-    Write-Build Green '  All integration tests passed.'
-
-    Remove-Module -Name $Script:ModuleName -Force -ErrorAction SilentlyContinue
 }
 
 #------------------------------------------------------------------------------
-# Changelog — update CHANGELOG.md with commits since last tag
+# Changelog - update CHANGELOG.md with commits since last tag
 #------------------------------------------------------------------------------
 task Changelog Version, {
     Write-Build Cyan 'Updating changelog...'
@@ -397,7 +423,7 @@ task Changelog Version, {
 }
 
 #------------------------------------------------------------------------------
-# Tag — commit manifest change and create git tag
+# Tag - commit manifest change and create git tag
 #------------------------------------------------------------------------------
 task Tag Version, {
     Write-Build Cyan "Tagging release v$($Script:ResolvedVersion)..."
@@ -410,7 +436,7 @@ task Tag Version, {
 }
 
 #------------------------------------------------------------------------------
-# Publish — publish the module to the configured repository
+# Publish - publish the module to the configured repository
 #
 # For PSGallery:        set $env:PSGALLERY_KEY to your NuGet API key
 # For private repos:    register the repo first with Register-PSRepository,
@@ -439,12 +465,12 @@ task Publish {
         Repository = $Script:Repository
     }
 
-    # NuGetApiKey is optional — private repos using credential-based or
+    # NuGetApiKey is optional - private repos using credential-based or
     # anonymous auth (e.g. internal NuGet feeds, local file shares) don't need it.
     if ($env:PSGALLERY_KEY) {
         $publishParams['NuGetApiKey'] = $env:PSGALLERY_KEY
     } else {
-        #Write-Build Yellow "  PSGALLERY_KEY not set — publishing without API key."
+        #Write-Build Yellow "  PSGALLERY_KEY not set - publishing without API key."
     }
 
     Publish-Module @publishParams
@@ -452,7 +478,7 @@ task Publish {
 }
 
 #------------------------------------------------------------------------------
-# Release — full release pipeline
+# Release - full release pipeline
 #------------------------------------------------------------------------------
 task Release Clean, Version, Build, Sign, TestIntegration, Changelog, Tag, Publish, {
     Write-Build Green "Release pipeline complete! Version $($Script:ResolvedVersion) published to $($Script:Repository)."

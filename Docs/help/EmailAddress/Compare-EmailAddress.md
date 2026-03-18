@@ -36,12 +36,12 @@ returns a [bool] indicating whether they are equal.
 Two comparison modes
 are available:
 
-  Default               — compares both the address portion and the display
+  Default               - compares both the address portion and the display
                           name, case-insensitively.
 Equivalent to
                           EmailAddress.Equals().
 
-  -IgnoreDisplayName    — compares only the address portion, ignoring any
+  -IgnoreDisplayName    - compares only the address portion, ignoring any
                           difference in display name.
 Useful when the same
                           recipient may appear with different display names.
@@ -126,10 +126,10 @@ Returns: $true, $false, $true
 When specified, returns a [PSCustomObject] instead of a plain [bool].
 The object has the following properties:
 
-  ReferenceAddress   [string]  — the formatted reference address
-  DifferenceAddress  [string]  — the formatted difference address
-  AreEqual           [bool]    — $true if the addresses are equal
-  IgnoredDisplayName [bool]    — whether -IgnoreDisplayName was used
+  ReferenceAddress   [string]  - the formatted reference address
+  DifferenceAddress  [string]  - the formatted difference address
+  AreEqual           [bool]    - $true if the addresses are equal
+  IgnoredDisplayName [bool]    - whether -IgnoreDisplayName was used
 
 ```yaml
 Type: System.Management.Automation.SwitchParameter

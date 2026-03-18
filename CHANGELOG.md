@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions release workflow (`.github/workflows/release.yml`): triggered on version tags, runs the full Clean → Analyze → Build → Test → Publish pipeline, extracts the matching CHANGELOG section for the GitHub Release body, and creates the GitHub Release
 - `InvokeBuild` task `TestIntegration`: runs integration tests against the built module output using `$env:EMAILADDRESS_BUILT_MODULE` to locate the correct build
 - `InvokeBuild` task `Test`: convenience task that runs both `TestUnit` and `TestIntegration` in sequence
-- `InvokeBuild` task `Release`: full release pipeline — `Clean`, `Analyze`, `Build`, `Test`, `Publish`
+- `InvokeBuild` task `Release`: full release pipeline - `Clean`, `Analyze`, `Build`, `Test`, `Publish`
 - `InvokeBuild` task `Publish`: publishes the built module to the PowerShell Gallery using `Publish-Module`; requires `-GalleryApiKey` or `PS_GALLERY_KEY` environment variable
 
 ### Changed
@@ -48,8 +48,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `Test-EmailAddress` cmdlet: tests one or more strings against RFC 5321/5322 validation rules; returns `[bool]` by default or a `[PSCustomObject]` with `Input`, `IsValid`, and `Reason` properties when `-Detailed` is specified; never throws; accepts pipeline input
 - `ConvertTo-EmailAddress` cmdlet: bulk-converts strings to `[EmailAddress]` objects; invalid input produces a non-terminating error and is skipped (use `-ErrorAction Stop` to make it terminating); accepts pipeline input
 - `ConvertTo-NormalizedEmailAddress` cmdlet: returns new `[EmailAddress]` objects with the address portion lowercased and trimmed; preserves display name; accepts `[EmailAddress]` objects (`FromEmailAddress` parameter set) or strings (`FromString` parameter set); accepts pipeline input
-- `Format-EmailAddress` cmdlet: formats an `[EmailAddress]` object as a string in one of three modes — `Address` (default), `Friendly`, or `RFC5322`; accepts pipeline input
-- `Get-EmailAddress` cmdlet: extracts a single named property from an `[EmailAddress]` object — `Address`, `DisplayName`, `LocalPart`, `Domain`, `Friendly`, or `RFC5322`; accepts pipeline input
+- `Format-EmailAddress` cmdlet: formats an `[EmailAddress]` object as a string in one of three modes - `Address` (default), `Friendly`, or `RFC5322`; accepts pipeline input
+- `Get-EmailAddress` cmdlet: extracts a single named property from an `[EmailAddress]` object - `Address`, `DisplayName`, `LocalPart`, `Domain`, `Friendly`, or `RFC5322`; accepts pipeline input
 - `Compare-EmailAddress` cmdlet: compares two email addresses for equality; supports `-IgnoreDisplayName` to compare address portions only and `-Detailed` to return a `[PSCustomObject]` with `ReferenceAddress`, `DifferenceAddress`, `AreEqual`, and `IgnoredDisplayName` properties; accepts pipeline input on `-ReferenceAddress`
 - Pester unit test suites for all public cmdlets and the `EmailAddress` class
 - `ModuleBuilder`-based build system via `InvokeBuild` (`.build.ps1`) with tasks: `Clean`, `Analyze`, `Build`, `TestUnit`

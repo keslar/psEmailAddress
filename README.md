@@ -1,6 +1,6 @@
 # EmailAddress
 
-A PowerShell module providing a strongly-typed `EmailAddress` class and eight cmdlets for parsing, validating, normalizing, formatting, and comparing RFC 5321/5322 email addresses — in both PowerShell 5.1 and PowerShell 7+.
+A PowerShell module providing a strongly-typed `EmailAddress` class and eight cmdlets for parsing, validating, normalizing, formatting, and comparing RFC 5321/5322 email addresses - in both PowerShell 5.1 and PowerShell 7+.
 
 [![CI](https://github.com/keslar/psEmailAddress/actions/workflows/ci.yml/badge.svg)](https://github.com/keslar/psEmailAddress/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/keslar/psEmailAddress/blob/main/LICENSE.md)
@@ -48,7 +48,7 @@ Import-Csv .\contacts.csv |
     Format-EmailAddress -Format RFC5322
 ```
 
-The `EmailAddress` class is **immutable**: all properties are set at construction time and are read-only. Cmdlets that appear to "modify" an address (like `Set-EmailAddress`) always return a new object — the original is never changed.
+The `EmailAddress` class is **immutable**: all properties are set at construction time and are read-only. Cmdlets that appear to "modify" an address (like `Set-EmailAddress`) always return a new object - the original is never changed.
 
 ---
 
@@ -106,26 +106,26 @@ if ([EmailAddress]::TryFromString("crk4@pitt.edu", [ref]$email)) {
 
 ### Properties
 
-| Property | Type | Description |
-|---|---|---|
-| `Address` | `string` | The plain address: `crk4@pitt.edu` |
+| Property      | Type     | Description                               |
+| ------------- | -------- | ----------------------------------------- |
+| `Address`     | `string` | The plain address: `crk4@pitt.edu`        |
 | `DisplayName` | `string` | The display name, or empty string if none |
 
 Both properties are read-only. Attempting to assign to them throws an error.
 
 ### Key methods
 
-| Method | Returns | Description |
-|---|---|---|
-| `GetAddress()` | `string` | Plain address: `crk4@pitt.edu` |
-| `GetDisplayName()` | `string` | Display name, or empty string |
-| `GetLocalPart()` | `string` | Portion before `@`: `crk4` |
-| `GetDomain()` | `string` | Portion after `@`: `pitt.edu` |
-| `GetFriendlyName()` | `string` | `Chris Keslar <crk4@pitt.edu>` if display name present, otherwise plain address |
-| `ToRFC5322String()` | `string` | RFC 5322 format with display name quoted where required |
-| `ToString()` | `string` | Plain address (used in string interpolation) |
-| `Equals($other)` | `bool` | Case-insensitive equality on both address and display name |
-| `EqualsIgnoreDisplayName($other)` | `bool` | Case-insensitive equality on address only |
+| Method                            | Returns  | Description                                                                     |
+| --------------------------------- | -------- | ------------------------------------------------------------------------------- |
+| `GetAddress()`                    | `string` | Plain address: `crk4@pitt.edu`                                                  |
+| `GetDisplayName()`                | `string` | Display name, or empty string                                                   |
+| `GetLocalPart()`                  | `string` | Portion before `@`: `crk4`                                                      |
+| `GetDomain()`                     | `string` | Portion after `@`: `pitt.edu`                                                   |
+| `GetFriendlyName()`               | `string` | `Chris Keslar <crk4@pitt.edu>` if display name present, otherwise plain address |
+| `ToRFC5322String()`               | `string` | RFC 5322 format with display name quoted where required                         |
+| `ToString()`                      | `string` | Plain address (used in string interpolation)                                    |
+| `Equals($other)`                  | `bool`   | Case-insensitive equality on both address and display name                      |
+| `EqualsIgnoreDisplayName($other)` | `bool`   | Case-insensitive equality on address only                                       |
 
 ---
 
@@ -156,7 +156,7 @@ Import-Csv .\contacts.csv | Select-Object -ExpandProperty Email | New-EmailAddre
 
 ### Test-EmailAddress
 
-Tests whether strings are valid email address formats. **Never throws** — invalid input returns `$false` rather than an error.
+Tests whether strings are valid email address formats. **Never throws** - invalid input returns `$false` rather than an error.
 
 ```powershell
 # Simple bool result
@@ -180,10 +180,10 @@ Import-Csv .\contacts.csv |
 
 ### ConvertTo-EmailAddress
 
-Bulk-converts strings to `[EmailAddress]` objects. Unlike `New-EmailAddress`, invalid input produces a **non-terminating error** and is skipped — the pipeline continues.
+Bulk-converts strings to `[EmailAddress]` objects. Unlike `New-EmailAddress`, invalid input produces a **non-terminating error** and is skipped - the pipeline continues.
 
 ```powershell
-# Mixed valid/invalid input — bad addresses are skipped
+# Mixed valid/invalid input - bad addresses are skipped
 "crk4@pitt.edu", "bad-address", "jdoe@example.com" | ConvertTo-EmailAddress
 
 # Collect errors separately without stopping the pipeline
@@ -220,11 +220,11 @@ Import-Csv .\contacts.csv |
 
 Formats an `[EmailAddress]` object as a string in one of three modes.
 
-| Format | Example output |
-|---|---|
-| `Address` *(default)* | `crk4@pitt.edu` |
-| `Friendly` | `Chris Keslar <crk4@pitt.edu>` |
-| `RFC5322` | `"Keslar, Chris" <crk4@pitt.edu>` *(quoted when required)* |
+| Format                | Example output                                             |
+| --------------------- | ---------------------------------------------------------- |
+| `Address` *(default)* | `crk4@pitt.edu`                                            |
+| `Friendly`            | `Chris Keslar <crk4@pitt.edu>`                             |
+| `RFC5322`             | `"Keslar, Chris" <crk4@pitt.edu>` *(quoted when required)* |
 
 ```powershell
 $email = New-EmailAddress -Address "Keslar, Chris <crk4@pitt.edu>"
@@ -288,7 +288,7 @@ Set-EmailAddress -InputObject $email -DisplayName ""
 Set-EmailAddress -InputObject $email -LocalPart "ckeslar"
 # Result: Chris Keslar <ckeslar@pitt.edu>
 
-# Replace just the domain — pipeline example
+# Replace just the domain - pipeline example
 "crk4@pitt.edu", "jdoe@pitt.edu" |
     New-EmailAddress |
     Set-EmailAddress -Domain "example.com"
@@ -309,7 +309,7 @@ Compare-EmailAddress -ReferenceAddress "crk4@pitt.edu" -DifferenceAddress "crk4@
 Compare-EmailAddress `
     -ReferenceAddress  "Chris Keslar <crk4@pitt.edu>" `
     -DifferenceAddress "C. Keslar <crk4@pitt.edu>"
-# $false — display names differ
+# $false - display names differ
 
 # -IgnoreDisplayName: compare address portion only
 Compare-EmailAddress `
@@ -338,18 +338,18 @@ $incoming | Compare-EmailAddress -DifferenceAddress "crk4@pitt.edu"
 
 Validation is applied at construction time by `[EmailAddress]::GetValidationFailureReason()`. The following rules are enforced:
 
-| Rule | Detail |
-|---|---|
-| Single `@` | Exactly one `@` symbol required |
-| Local part length | 1–64 characters |
-| Local part characters | Letters, digits, and: `. ! # $ % & ' * + - / = ? ^ _ \` { \| } ~` |
-| Local part dots | Not at start, not at end, no consecutive dots |
-| Domain length | 1–255 characters |
-| Domain label length | Each label (dot-separated segment) must be 1–63 characters |
-| Domain label characters | Letters, digits, and hyphens only |
-| Domain label hyphens | Not at start or end of a label |
-| TLD | At least one dot required; TLD must be at least 2 characters |
-| Total length | Must not exceed 320 characters |
+| Rule                    | Detail                                                            |
+| ----------------------- | ----------------------------------------------------------------- |
+| Single `@`              | Exactly one `@` symbol required                                   |
+| Local part length       | 1–64 characters                                                   |
+| Local part characters   | Letters, digits, and: `. ! # $ % & ' * + - / = ? ^ _ \` { \| } ~` |
+| Local part dots         | Not at start, not at end, no consecutive dots                     |
+| Domain length           | 1–255 characters                                                  |
+| Domain label length     | Each label (dot-separated segment) must be 1–63 characters        |
+| Domain label characters | Letters, digits, and hyphens only                                 |
+| Domain label hyphens    | Not at start or end of a label                                    |
+| TLD                     | At least one dot required; TLD must be at least 2 characters      |
+| Total length            | Must not exceed 320 characters                                    |
 
 > **Note:** Quoted local parts (e.g. `"john doe"@example.com`) and IP address literals (e.g. `user@[192.168.1.1]`) are intentionally not supported, as they are rarely accepted by real-world mail systems.
 

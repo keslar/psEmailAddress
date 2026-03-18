@@ -35,12 +35,12 @@ implemented by the EmailAddress class and returns a result for each input.
 
 Two output modes are supported:
 
-  Default  — returns a [bool] for each input: $true if the address is
+  Default  - returns a [bool] for each input: $true if the address is
              valid, $false otherwise.
 Suitable for simple conditional
              checks and pipeline filtering.
 
-  Detailed — returns a [PSCustomObject] for each input containing the
+  Detailed - returns a [PSCustomObject] for each input containing the
              original input string, a IsValid flag, and a Reason
              explaining why the address is invalid (or empty if valid).
              Suitable for batch validation reports.
@@ -134,9 +134,9 @@ When specified, returns a [PSCustomObject] for each input instead of a
 [bool].
 The object has three properties:
 
-  Input   [string]  — the original input value
-  IsValid [bool]    — $true if the address passed validation
-  Reason  [string]  — a description of why the address is invalid,
+  Input   [string]  - the original input value
+  IsValid [bool]    - $true if the address passed validation
+  Reason  [string]  - a description of why the address is invalid,
                       or an empty string if it is valid
 
 ```yaml

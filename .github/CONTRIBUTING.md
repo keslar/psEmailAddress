@@ -36,21 +36,21 @@ process looks like.
 ## Code of Conduct
 
 This project follows a standard code of conduct. Please be respectful in all
-interactions — issues, pull requests, and discussions. See
+interactions - issues, pull requests, and discussions. See
 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for details.
 
 ---
 
 ## Ways to Contribute
 
-- **Bug reports** — if something behaves unexpectedly, open an issue using the
+- **Bug reports** - if something behaves unexpectedly, open an issue using the
   bug report template
-- **Feature requests** — if you have an idea for a new capability, open an issue
+- **Feature requests** - if you have an idea for a new capability, open an issue
   using the feature request template to discuss it before writing any code
-- **Bug fixes** — pick up an open issue labeled `bug` and submit a pull request
-- **Documentation** — corrections, clarifications, and additional examples are
+- **Bug fixes** - pick up an open issue labeled `bug` and submit a pull request
+- **Documentation** - corrections, clarifications, and additional examples are
   always welcome
-- **Tests** — additional test cases that improve coverage or document edge cases
+- **Tests** - additional test cases that improve coverage or document edge cases
 
 If you are planning to work on something non-trivial, open an issue first so we
 can discuss the approach before you invest the time.
@@ -101,15 +101,15 @@ foreach ($name in $modules.Keys) {
 
 The required modules are:
 
-| Module            | Purpose                              |
-|-------------------|--------------------------------------|
-| `InvokeBuild`     | Task runner (`Invoke-Build`)         |
-| `ModuleBuilder`   | Compiles source into a `.psm1`       |
-| `Pester`          | Test framework                       |
-| `PSScriptAnalyzer`| Static analysis / linting            |
-| `Configuration`   | Required by `ModuleBuilder`          |
-| `Metadata`        | Required by `ModuleBuilder`          |
-| `PowerShellGet`   | Module publishing                    |
+| Module             | Purpose                        |
+| ------------------ | ------------------------------ |
+| `InvokeBuild`      | Task runner (`Invoke-Build`)   |
+| `ModuleBuilder`    | Compiles source into a `.psm1` |
+| `Pester`           | Test framework                 |
+| `PSScriptAnalyzer` | Static analysis / linting      |
+| `Configuration`    | Required by `ModuleBuilder`    |
+| `Metadata`         | Required by `ModuleBuilder`    |
+| `PowerShellGet`    | Module publishing              |
 
 ### 3. Verify the setup
 
@@ -128,7 +128,7 @@ A clean run should produce no PSScriptAnalyzer errors and no failing tests.
 
 ```
 psEmailAddress/
-├── Source/                         # All source files — edit these, not Build/
+├── Source/                         # All source files - edit these, not Build/
 │   ├── Classes/
 │   │   └── EmailAddress.ps1        # The EmailAddress class
 │   ├── Public/                     # Exported cmdlets (one file per cmdlet)
@@ -158,7 +158,7 @@ psEmailAddress/
 │   └── help/
 │       └── en-US/
 │           └── about_EmailAddress.help.txt
-├── Build/                          # Build output — do not edit, do not commit
+├── Build/                          # Build output - do not edit, do not commit
 ├── .build.ps1                      # InvokeBuild task definitions
 ├── RequiredModules.psd1            # Build tool dependencies
 ├── PSScriptAnalyzerSettings.ps1    # Linting rules
@@ -174,7 +174,7 @@ All changes go in `Source/` and `Tests/`.
 
 ### Adding a new public cmdlet
 
-1. Create `Source/Public/YourVerb-EmailAddress.ps1` — use an existing cmdlet as a
+1. Create `Source/Public/YourVerb-EmailAddress.ps1` - use an existing cmdlet as a
    template for structure and style
 2. Add the function name to `FunctionsToExport` in `Source/EmailAddress.psd1`
 3. Create `Tests/Unit/Public/YourVerb-EmailAddress.Tests.ps1` with full Pester
@@ -203,7 +203,7 @@ threshold**. A pull request that drops coverage below 90% will fail CI.
 ### Running tests
 
 ```powershell
-# Unit tests only (fast — no build required)
+# Unit tests only (fast - no build required)
 Invoke-Build TestUnit
 
 # Integration tests (requires a build first)
@@ -237,11 +237,11 @@ tests before opening a pull request.
 
 Every pull request runs on three platforms via GitHub Actions:
 
-| Platform         | PowerShell  |
-|------------------|-------------|
-| Windows          | 5.1         |
-| Windows          | 7 (latest)  |
-| Ubuntu           | 7 (latest)  |
+| Platform | PowerShell |
+| -------- | ---------- |
+| Windows  | 5.1        |
+| Windows  | 7 (latest) |
+| Ubuntu   | 7 (latest) |
 
 All three must pass before a pull request can be merged.
 
@@ -258,7 +258,7 @@ in the existing source files:
 - **Brace style:** opening brace on the same line as the statement
 - **Comment-based help:** every public function must have a full `.SYNOPSIS`,
   `.DESCRIPTION`, one `.PARAMETER` block per parameter, at least two `.EXAMPLE`
-  blocks, and an `.INPUTS` / `.OUTPUTS` / `.NOTES` section — follow the existing
+  blocks, and an `.INPUTS` / `.OUTPUTS` / `.NOTES` section - follow the existing
   cmdlets as a template
 - **`[CmdletBinding()]`:** required on every public function
 - **`[OutputType()]`:** required on every public function
@@ -297,7 +297,7 @@ Do not suppress additional rules in source files without discussing it first.
    git checkout -b feature/add-group-address-support
    ```
 
-2. **Make your changes** — keep commits focused and atomic. A pull request should
+2. **Make your changes** - keep commits focused and atomic. A pull request should
    do one thing.
 
 3. **Run the full default build** and confirm it is clean:
@@ -311,7 +311,7 @@ Do not suppress additional rules in source files without discussing it first.
    ```
 
 5. **Push and open a pull request** against the `main` branch. Use the appropriate
-   pull request template (bug fix or feature). Fill it in completely — a PR with
+   pull request template (bug fix or feature). Fill it in completely - a PR with
    an empty description takes longer to review.
 
 6. **Respond to review feedback.** Push additional commits to the same branch; do
@@ -335,7 +335,7 @@ Before marking a pull request ready for review, confirm:
 ## What to Expect
 
 This module is maintained by a single developer. Pull requests are reviewed on a
-best-effort basis — typically within a few business days for small changes, longer
+best-effort basis - typically within a few business days for small changes, longer
 for larger ones. You will receive feedback, a request for changes, or a merge.
 
 If you have not heard back within two weeks, a polite comment on the PR to check

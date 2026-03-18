@@ -1,3 +1,5 @@
+if ((Get-Module Pester).Version.Major -lt 5) { Write-Warning "This test file requires Pester v5 or later. Skipping."; return }
+
 BeforeAll {
     # Find the project root by going up three levels from the current script directory
     # Tests\Unit\Public\ -> Tests\Unit\ -> Tests\ -> ProjectRoot\
@@ -9,13 +11,13 @@ BeforeAll {
     # Dot-source the prefix file to set up the environment and variables
     . $ProjectRoot/Source/prefix.ps1
 
-    # Dot-source the EmailAddress class — required before the cmdlet can be loaded
+    # Dot-source the EmailAddress class - required before the cmdlet can be loaded
     . $ProjectRoot/Source/Classes/EmailAddress.ps1
 
     # Dot-source the helper function for resolving string inputs to EmailAddress objects
     . $ProjectRoot/Source/Private/Resolve-EmailAddressInput.ps1
-    
-    # Dot-source New-EmailAddress — used to build test fixtures
+
+    # Dot-source New-EmailAddress - used to build test fixtures
     . $ProjectRoot/Source/Public/New-EmailAddress.ps1
 
     # Dot-source the cmdlet under test
@@ -35,14 +37,12 @@ BeforeAll {
     # Different address entirely
     $script:other = New-EmailAddress -Address "jdoe@example.com"
 
-    # Uppercase variant of addrA — same address, different case
+    # Uppercase variant of addrA - same address, different case
     $script:upperA = New-EmailAddress -Address "CRK4@PITT.EDU"
 }
 
 Describe "Compare-EmailAddress Cmdlet Tests" {
-
     Context "1 Default Comparison (Address and Display Name)" {
-
         Context "1.1 Equal Inputs" {
             It "1.1.1 Should return true for two identical plain addresses" {
                 Compare-EmailAddress -ReferenceAddress $script:addrA -DifferenceAddress $script:addrB | Should -Be $true
@@ -171,7 +171,7 @@ Describe "Compare-EmailAddress Cmdlet Tests" {
         }
         It "3.6 Should throw a terminating error for an invalid DifferenceAddress string" {
             # DifferenceAddress is resolved in the begin block, so the error fires
-            # before process runs — even before any pipeline input is processed.
+            # before process runs - even before any pipeline input is processed.
             { Compare-EmailAddress -ReferenceAddress "crk4@pitt.edu" -DifferenceAddress "notvalid" } | Should -Throw
         }
         It "3.7 Should use the same DifferenceAddress object for every piped ReferenceAddress input" {

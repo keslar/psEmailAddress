@@ -8,11 +8,11 @@
 
         Two parameter sets are supported:
 
-          FromString    — accepts a plain address ("user@example.com") or a named
+          FromString    - accepts a plain address ("user@example.com") or a named
                           mailbox string ("Display Name <user@example.com>").
                           Accepts pipeline input.
 
-          FromComponents — accepts the local part, domain, and an optional display
+          FromComponents - accepts the local part, domain, and an optional display
                            name as separate parameters, and assembles the address
                            internally.
 

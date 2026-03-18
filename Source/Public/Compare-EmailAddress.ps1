@@ -7,11 +7,11 @@
         returns a [bool] indicating whether they are equal. Two comparison modes
         are available:
 
-          Default               — compares both the address portion and the display
+          Default               - compares both the address portion and the display
                                   name, case-insensitively. Equivalent to
                                   EmailAddress.Equals().
 
-          -IgnoreDisplayName    — compares only the address portion, ignoring any
+          -IgnoreDisplayName    - compares only the address portion, ignoring any
                                   difference in display name. Useful when the same
                                   recipient may appear with different display names.
                                   Equivalent to EmailAddress.EqualsIgnoreDisplayName()
@@ -47,10 +47,10 @@
         When specified, returns a [PSCustomObject] instead of a plain [bool].
         The object has the following properties:
 
-          ReferenceAddress   [string]  — the formatted reference address
-          DifferenceAddress  [string]  — the formatted difference address
-          AreEqual           [bool]    — $true if the addresses are equal
-          IgnoredDisplayName [bool]    — whether -IgnoreDisplayName was used
+          ReferenceAddress   [string]  - the formatted reference address
+          DifferenceAddress  [string]  - the formatted difference address
+          AreEqual           [bool]    - $true if the addresses are equal
+          IgnoredDisplayName [bool]    - whether -IgnoreDisplayName was used
 
     .INPUTS
         [string]        A plain address or named mailbox string piped to -ReferenceAddress.
@@ -149,7 +149,7 @@ function Compare-EmailAddress {
     )
 
     begin {
-        # Resolve -DifferenceAddress once in begin — it is a fixed value for all
+        # Resolve -DifferenceAddress once in begin - it is a fixed value for all
         # pipeline inputs, so there is no need to re-resolve it on every iteration.
         $diffEmail = Resolve-EmailAddressInput -InputValue $DifferenceAddress -ParameterName 'DifferenceAddress'
     }

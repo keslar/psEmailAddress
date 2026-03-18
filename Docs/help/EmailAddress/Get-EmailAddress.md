@@ -37,24 +37,24 @@ read any property of an EmailAddress without calling instance methods directly.
 
 The -Property parameter controls which value is returned:
 
-  Address     — the plain address string ("crk4@pitt.edu").
+  Address     - the plain address string ("crk4@pitt.edu").
                 Equivalent to EmailAddress.GetAddress().
 
-  DisplayName — the display name, or empty string if none is set.
+  DisplayName - the display name, or empty string if none is set.
                 Equivalent to EmailAddress.GetDisplayName().
 
-  LocalPart   — the portion of the address before the @ symbol ("crk4").
+  LocalPart   - the portion of the address before the @ symbol ("crk4").
                 Equivalent to EmailAddress.GetLocalPart().
 
-  Domain      — the domain portion of the address ("pitt.edu").
+  Domain      - the domain portion of the address ("pitt.edu").
                 Equivalent to EmailAddress.GetDomain().
 
-  Friendly    — the named mailbox string if a display name is present,
+  Friendly    - the named mailbox string if a display name is present,
                 otherwise the plain address.
 ("Chris Keslar <crk4@pitt.edu>")
                 Equivalent to EmailAddress.GetFriendlyName().
 
-  RFC5322     — RFC 5322-compliant format with quoting applied to the
+  RFC5322     - RFC 5322-compliant format with quoting applied to the
                 display name where required.
                 Equivalent to EmailAddress.ToRFC5322String().
 

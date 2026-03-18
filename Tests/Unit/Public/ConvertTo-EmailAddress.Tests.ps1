@@ -1,3 +1,5 @@
+if ((Get-Module Pester).Version.Major -lt 5) { Write-Warning "This test file requires Pester v5 or later. Skipping."; return }
+
 BeforeAll {
     # Find the project root by going up three levels from the current script directory
     # Tests\Unit\Public\ -> Tests\Unit\ -> Tests\ -> ProjectRoot\
@@ -9,23 +11,21 @@ BeforeAll {
     # Dot-source the prefix file to set up the environment and variables
     . $ProjectRoot/Source/prefix.ps1
 
-    # Dot-source the EmailAddress class — required before the cmdlet can be loaded
+    # Dot-source the EmailAddress class - required before the cmdlet can be loaded
     . $ProjectRoot/Source/Classes/EmailAddress.ps1
 
     # Dot-source Resolve-EmailAddressInput.ps1 
     . $ProjectRoot/Source/Private/Resolve-EmailAddressInput.ps1
 
-    # Dot-source New-EmailAddress — used in Context 4 and 5 for comparison tests
+    # Dot-source New-EmailAddress - used in Context 4 and 5 for comparison tests
     . $ProjectRoot/Source/Public/New-EmailAddress.ps1
-    
+
     # Dot-source the cmdlet under test
     . $ProjectRoot/Source/Public/ConvertTo-EmailAddress.ps1
 }
 
 Describe "ConvertTo-EmailAddress Cmdlet Tests" {
-
     Context "1 Valid Input" {
-
         Context "1.1 Plain Address Strings" {
             It "1.1.1 Should return an EmailAddress object from a plain address" {
                 $result = ConvertTo-EmailAddress -InputObject "crk4@pitt.edu"
@@ -94,7 +94,7 @@ Describe "ConvertTo-EmailAddress Cmdlet Tests" {
         }
         #It "2.7 Should write a terminating error for an invalid address" {
         #    # 2>&1 merges the error stream into the output stream for capture.
-        #    # -ErrorAction SilentlyContinue must NOT be used here — it suppresses
+        #    # -ErrorAction SilentlyContinue must NOT be used here - it suppresses
         #    # errors before they reach the merged stream, resulting in zero captures.
         #    { ConvertTo-EmailAddress -InputObject "notanemail" } | Should -Throw
         #    #$errs27 = ConvertTo-EmailAddress -InputObject "notanemail" 2>&1 |
@@ -136,7 +136,7 @@ Describe "ConvertTo-EmailAddress Cmdlet Tests" {
         }
         #It "3.4 Should write  a terminating error per invalid address in the pipeline" {
         #    # 2>&1 merges the error stream into the output stream for capture.
-        #    # -ErrorAction SilentlyContinue must NOT be combined with 2>&1 — it
+        #    # -ErrorAction SilentlyContinue must NOT be combined with 2>&1 - it
         #    # suppresses errors before they reach the merged stream.
         #    $errs34 = "crk4@pitt.edu", "bad1", "bad2", "jdoe@example.com" |
         #        ConvertTo-EmailAddress 2>&1 |
