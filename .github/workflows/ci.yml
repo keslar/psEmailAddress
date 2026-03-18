@@ -92,7 +92,7 @@ jobs:
 
             - name: Upload integration test results
               if: always()
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v5
               with:
                   name: integration-test-results-ubuntu-pwsh
                   path: TestResults-Integration.xml
@@ -115,7 +115,7 @@ jobs:
             # 1. Checkout
             # -------------------------------------------------------------------
             - name: Checkout repository
-              uses: actions/checkout@v4
+              uses: actions/checkout@v5
 
             # -------------------------------------------------------------------
             # 2. Bootstrap PowerShellGet
