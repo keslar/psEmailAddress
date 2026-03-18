@@ -176,7 +176,7 @@ All changes go in `Source/` and `Tests/`.
 
 1. Create `Source/Public/YourVerb-EmailAddress.ps1` - use an existing cmdlet as a
    template for structure and style
-2. Add the function name to `FunctionsToExport` in `Source/EmailAddress.psd1`
+2. Add the function name to `FunctionsToExport` in `Source/psEmailAddress.psd1`
 3. Create `Tests/Unit/Public/YourVerb-EmailAddress.Tests.ps1` with full Pester
    coverage (see [Tests](#tests) below)
 4. Add the cmdlet to the `CMDLET SUMMARY` section in

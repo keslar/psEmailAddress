@@ -9,10 +9,10 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    RootModule        = 'EmailAddress.psm1'
+    RootModule        = 'psEmailAddress.psm1'
 
     # Version number of this module.
-    ModuleVersion     = '1.0.1'
+ModuleVersion = '1.0.1'
 
     # Supported PSEditions
     # CompatiblePSEditions = @()
@@ -131,4 +131,36 @@ email addresses in PowerShell 5.1 and PowerShell 7+.'
     # DefaultCommandPrefix = ''
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

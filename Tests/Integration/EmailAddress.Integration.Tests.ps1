@@ -1,8 +1,15 @@
+param(
+    [string]$ModulePath
+)
+
 if ((Get-Module Pester).Version.Major -lt 5) { Write-Warning "This test file requires Pester v5 or later. Skipping."; return }
 
 BeforeAll {
     # Ensure we're running from the project root where the module can be found
     Set-Location -Path $PSScriptRoot
+
+    # Expected Public Cmdlets Count
+    $Script:ExpectedCmdletCount = 8
 
     #################################################################################
     # Locate the built module
@@ -12,12 +19,20 @@ BeforeAll {
     # the module base directory. If the variable is not set, we fall back to the
     # most recently built version under Build/.
     #################################################################################
-    $ProjectRoot = (Resolve-Path -Literal (Join-Path -Path $PSScriptRoot -ChildPath '..\..')).Path
+    $script:ProjectRoot = (Resolve-Path -Literal (Join-Path -Path $PSScriptRoot -ChildPath '..\..')).Path
+    $script:ModuleName = Split-Path -Path $ProjectRoot -Leaf
+
+
     if ($env:EMAILADDRESS_BUILT_MODULE -and (Test-Path $env:EMAILADDRESS_BUILT_MODULE)) {
         $script:ModuleBase = $env:EMAILADDRESS_BUILT_MODULE
+    } elseif ($ModulePath) {
+        if (-not (Test-Path $ModulePath)) {
+            throw "Specified module path '$ModulePath' does not exist."
+        }
+        $script:ModuleBase = (Resolve-Path -Literal $ModulePath).Path
     } else {
         # Find the highest version directory under Build/EmailAddress/
-        $buildRoot = Join-Path $ProjectRoot 'Output' 'EmailAddress'
+        $buildRoot = Join-Path -Path $script:ProjectRoot -ChildPath 'Output' | Join-Path -ChildPath $script:ModuleName
         $latestBuild = Get-ChildItem -Path $buildRoot -Directory |
             Sort-Object { [version]$_.Name } |
             Select-Object -Last 1
@@ -26,10 +41,11 @@ BeforeAll {
         }
         $script:ModuleBase = $latestBuild.FullName
     }
-    $script:ManifestPath = Join-Path $script:ModuleBase 'EmailAddress.psd1'
+    $script:ManifestPath = Join-Path $script:ModuleBase "$($Script:ModuleName).psd1"
+    
     # Import the module fresh -- remove any previously loaded copy first
-    if (Get-Module -Name EmailAddress) {
-        Remove-Module -Name EmailAddress -Force
+    if (Get-Module -Name $script:ModuleName) {
+        Remove-Module -Name $script:ModuleName  -Force
     }
     Import-Module $script:ManifestPath -Force -ErrorAction Stop
 
@@ -37,8 +53,8 @@ BeforeAll {
 
 AfterAll {
     # Clean up -- remove the module after the test run
-    if (Get-Module -Name EmailAddress) {
-        Remove-Module -Name EmailAddress -Force
+    if (Get-Module -Name $script:ModuleName) {
+        Remove-Module -Name $script:ModuleName -Force
     }
 }
 
@@ -50,48 +66,48 @@ Describe 'EmailAddress Module Integration Tests' {
     Context '1 Module Loading' {
 
         It '1.1 Should import without error' {
-            Get-Module -name EmailAddress | Should -Not -BeNullOrEmpty
+            Get-Module -Name $script:ModuleName | Should -Not -BeNullOrEmpty
         }
 
         It '1.2 Should export exactly 8 public cmdlets' {
-            $exported = (Get-Module -name EmailAddress).ExportedFunctions.Keys
-            $exported.Count | Should -Be 8
+            $exported = (Get-Module -Name $script:ModuleName).ExportedFunctions.Keys
+            $exported.Count | Should -Be $Script:ExpectedCmdletCount
         }
 
         It '1.3 Should export Compare-EmailAddress' {
-            Get-Command -Module EmailAddress -name 'Compare-EmailAddress' | Should -Not -BeNullOrEmpty
+            Get-Command -Module $script:ModuleName -Name 'Compare-EmailAddress' | Should -Not -BeNullOrEmpty
         }
 
         It '1.4 Should export ConvertTo-EmailAddress' {
-            Get-Command -Module EmailAddress -name 'ConvertTo-EmailAddress' | Should -Not -BeNullOrEmpty
+            Get-Command -Module $script:ModuleName -Name 'ConvertTo-EmailAddress' | Should -Not -BeNullOrEmpty
         }
 
         It '1.5 Should export ConvertTo-NormalizedEmailAddress' {
-            Get-Command -Module EmailAddress -name 'ConvertTo-NormalizedEmailAddress' | Should -Not -BeNullOrEmpty
+            Get-Command -Module $script:ModuleName -Name 'ConvertTo-NormalizedEmailAddress' | Should -Not -BeNullOrEmpty
         }
 
         It '1.6 Should export Format-EmailAddress' {
-            Get-Command -Module EmailAddress -name 'Format-EmailAddress' | Should -Not -BeNullOrEmpty
+            Get-Command -Module $script:ModuleName -Name 'Format-EmailAddress' | Should -Not -BeNullOrEmpty
         }
 
         It '1.7 Should export Get-EmailAddress' {
-            Get-Command -Module EmailAddress -name 'Get-EmailAddress' | Should -Not -BeNullOrEmpty
+            Get-Command -Module $script:ModuleName -Name 'Get-EmailAddress' | Should -Not -BeNullOrEmpty
         }
 
         It '1.8 Should export New-EmailAddress' {
-            Get-Command -Module EmailAddress -name 'New-EmailAddress' | Should -Not -BeNullOrEmpty
+            Get-Command -Module $script:ModuleName -Name 'New-EmailAddress' | Should -Not -BeNullOrEmpty
         }
 
         It '1.9 Should export Set-EmailAddress' {
-            Get-Command -Module EmailAddress -name 'Set-EmailAddress' | Should -Not -BeNullOrEmpty
+            Get-Command -Module $script:ModuleName -Name 'Set-EmailAddress' | Should -Not -BeNullOrEmpty
         }
 
         It '1.10 Should export Test-EmailAddress' {
-            Get-Command -Module EmailAddress -name 'Test-EmailAddress' | Should -Not -BeNullOrEmpty
+            Get-Command -Module $script:ModuleName -Name 'Test-EmailAddress' | Should -Not -BeNullOrEmpty
         }
 
         It '1.11 Should not export any private functions' {
-            Get-Command -Module EmailAddress -name 'Resolve-EmailAddressInput' -ErrorAction SilentlyContinue |
+            Get-Command -Module $script:ModuleName -Name 'Resolve-EmailAddressInput' -ErrorAction SilentlyContinue |
                 Should -BeNullOrEmpty
         }
 
@@ -592,8 +608,8 @@ Describe 'EmailAddress Module Integration Tests' {
         }
 
         It '11.2 All cmdlets should still be available after re-import' {
-            $exported = (Get-Module -name EmailAddress).ExportedFunctions.Keys
-            $exported.Count | Should -Be 8
+            $exported = (Get-Module -Name $script:ModuleName).ExportedFunctions.Keys
+            $exported.Count | Should -Be $Script:ExpectedCmdletCount
         }
 
         It '11.3 The EmailAddress type should still be usable after re-import' {

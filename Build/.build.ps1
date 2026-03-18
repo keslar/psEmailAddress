@@ -58,8 +58,8 @@ Import-Module ModuleBuilder -ErrorAction Stop
 ###############################################################################
 $Script:ProjectRoot = Split-Path -Path $PSScriptRoot -Parent
 $Script:SourcePath = Join-Path  -Path $Script:ProjectRoot -ChildPath 'Source'
-$Script:ModuleName = 'EmailAddress'
-#$Script:ModuleName = Split-Path -Path $Script:ProjectRoot -Leaf
+#$Script:ModuleName = 'EmailAddress'
+$Script:ModuleName = Split-Path -Path $Script:ProjectRoot -Leaf
 #$Script:ModuleName = (Get-ChildItem -Path $Script:SourcePath -Filter '*.psd1' |
 #        Select-Object -First 1).BaseName
 $Script:ManifestPath = Join-Path  -Path $Script:SourcePath  -ChildPath "$($Script:ModuleName).psd1"
@@ -373,7 +373,7 @@ task TestIntegration Sign, {
     $testsPath = $Script:TestsPath
     $moduleName = $Script:ModuleName
     $psd1Path = Join-Path $Script:BuiltModuleBase "$($Script:ModuleName).psd1"
-
+    
     pwsh -NoProfile -NonInteractive -Command {
         param($TestsPath, $ModuleName, $Psd1Path)
 
@@ -396,6 +396,7 @@ task TestIntegration Sign, {
         $pesterConfig.TestResult.OutputFormat = 'JUnitXml'
         $pesterConfig.TestResult.OutputPath = Join-Path $TestsPath 'Results/TestResults-Integration.xml'
 
+        #$results = Invoke-Pester -Configuration $pesterConfig -Data @{ ModulePath = $Psd1Path}
         $results = Invoke-Pester -Configuration $pesterConfig
 
         Write-Host "  Passed: $($results.PassedCount)   Failed: $($results.FailedCount)   Skipped: $($results.SkippedCount)"
